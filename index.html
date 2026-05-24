@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · No Preview · Created by Mahmoud Hamouda</title>
+    <title>Video Compressor · No Playback · Created by Mahmoud Hamouda</title>
     <!-- Anti-cache meta tags -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -64,6 +64,12 @@
 
         .no-cache-badge {
             background: #10b981;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .no-playback-badge {
+            background: #ef4444;
             color: white;
             margin-left: 8px;
         }
@@ -133,17 +139,6 @@
             color: #1e40af;
         }
 
-        /* Hidden video element - no preview shown to user */
-        .hidden-video {
-            display: none;
-            position: absolute;
-            visibility: hidden;
-            width: 0;
-            height: 0;
-            opacity: 0;
-            pointer-events: none;
-        }
-
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -208,15 +203,6 @@
 
         button.secondary {
             background: #475569;
-        }
-
-        button.whatsapp {
-            background: #25D366;
-        }
-
-        button.whatsapp:hover {
-            background: #128C7E;
-            transform: scale(1.02);
         }
 
         button:disabled {
@@ -345,12 +331,6 @@
             flex-wrap: wrap;
         }
 
-        .no-preview-badge {
-            background: #ef4444;
-            color: white;
-            margin-left: 8px;
-        }
-
         @media (max-width: 640px) {
             .content { padding: 20px; }
             .settings-grid { grid-template-columns: 1fr; }
@@ -368,14 +348,13 @@
             <p>MP4 · MOV · AVI · MKV · WebM · All formats supported</p>
             <div class="badge">⚡ 100% local · No upload · Privacy guaranteed</div>
             <div class="badge no-cache-badge">🔒 NO CACHE · NO SITE DATA</div>
-            <div class="badge no-preview-badge">🚫 NO VIDEO PREVIEW DURING COMPRESSION</div>
+            <div class="badge no-playback-badge">🚫 NO VIDEO PLAYBACK · SILENT PROCESSING</div>
             <div class="creator-tag">Created by Mahmoud Hamouda</div>
         </div>
         <div class="content">
-            <!-- Privacy Notice -->
             <div class="privacy-note">
-                🔐 <strong>Privacy Mode Active:</strong> No cache, no localStorage, no IndexedDB, no video preview during compression.
-                All data is cleared when you close the page.
+                🔐 <strong>Privacy Mode Active:</strong> No cache, no localStorage, no IndexedDB, <strong>NO VIDEO PLAYBACK</strong> during compression.
+                Videos are processed silently in the background without any visual or audio output.
             </div>
 
             <div class="upload-area" id="uploadZone">
@@ -428,7 +407,7 @@
             </div>
 
             <div class="action-buttons">
-                <button id="compressBtn" disabled>🎬 Compress Video</button>
+                <button id="compressBtn" disabled>🎬 Compress Video (Silent)</button>
                 <button id="downloadBtn" disabled>💾 Download Result</button>
                 <button id="clearBtn" class="secondary">🗑️ Clear All</button>
             </div>
@@ -444,12 +423,11 @@
                 📌 Ready — Click the "Browse" button above or drag a video file to begin
             </div>
             <div class="info-note">
-                💡 Works with MP4, WebM, AVI, MOV, MKV. No video preview appears during compression.
+                💡 Works with MP4, WebM, AVI, MOV, MKV. <strong>No video playback occurs during compression</strong> — processing is completely silent.
                 Refresh the page = complete data wipe.
             </div>
         </div>
 
-        <!-- Contact Bar with WhatsApp API -->
         <div class="contact-bar">
             <div class="credit">
                 👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024 All rights reserved
@@ -459,47 +437,36 @@
             </a>
         </div>
         <footer>
-            🔒 100% local processing · No video preview · No cache · No site data stored
+            🔒 100% local processing · NO VIDEO PLAYBACK · NO CACHE · NO SITE DATA STORED
         </footer>
     </div>
 </div>
-
-<!-- Hidden video element - never shown to user, only used for processing -->
-<div class="hidden-video"></div>
 
 <script>
     // ============================================
     // COMPLETE CACHE & SITE DATA PREVENTION
     // ============================================
     
-    // 1. Disable localStorage completely
     Storage.prototype.getItem = function() { console.warn('[Privacy] localStorage blocked'); return null; };
     Storage.prototype.setItem = function() { console.warn('[Privacy] localStorage blocked'); return; };
     Storage.prototype.removeItem = function() { console.warn('[Privacy] localStorage blocked'); return; };
     Storage.prototype.clear = function() { console.warn('[Privacy] localStorage blocked'); return; };
     
-    // 2. Disable sessionStorage
     sessionStorage.getItem = function() { return null; };
     sessionStorage.setItem = function() { return; };
     sessionStorage.removeItem = function() { return; };
     sessionStorage.clear = function() { return; };
     
-    // 3. Block IndexedDB
     if (window.indexedDB) {
-        window.indexedDB.open = function() {
-            console.warn('[Privacy] IndexedDB blocked');
-            throw new DOMException('IndexedDB disabled');
-        };
+        window.indexedDB.open = function() { throw new DOMException('IndexedDB disabled'); };
         window.indexedDB.deleteDatabase = function() { return; };
     }
     
-    // 4. Disable Cache API
     if (window.caches) {
         window.caches.open = async function() { throw new Error('Cache disabled'); };
         window.caches.keys = async () => [];
     }
     
-    // 5. Override fetch to prevent caching
     const originalFetch = window.fetch;
     window.fetch = function(...args) {
         const options = args[1] || {};
@@ -508,27 +475,25 @@
         return originalFetch.call(this, args[0], options);
     };
     
-    // 6. Clear any existing data
     try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
     
-    // 7. Prevent service worker
     if (navigator.serviceWorker && navigator.serviceWorker.register) {
         navigator.serviceWorker.register = function() {
             return Promise.reject(new Error('ServiceWorker disabled'));
         };
     }
     
-    console.log('[Privacy] All cache and storage disabled - No video preview during compression');
+    console.log('[Privacy] All cache/storage disabled - NO VIDEO PLAYBACK during compression');
     
     // ============================================
-    // VIDEO COMPRESSOR LOGIC - NO PREVIEW
+    // VIDEO COMPRESSOR - NO PLAYBACK VERSION
+    // Uses seek() and capture frames without playing the video
     // ============================================
     
     let originalVideoFile = null;
     let originalVideoUrl = null;
     let compressedBlob = null;
     let isCompressing = false;
-    let hiddenVideoElement = null;
 
     // DOM elements
     const uploadZone = document.getElementById('uploadZone');
@@ -603,24 +568,6 @@
         return parseFloat(resolutionScale.value);
     }
 
-    // Create hidden video element (no preview)
-    function createHiddenVideo() {
-        const container = document.querySelector('.hidden-video');
-        const video = document.createElement('video');
-        video.setAttribute('playsinline', 'true');
-        video.setAttribute('webkit-playsinline', 'true');
-        video.muted = true;
-        video.style.display = 'none';
-        video.style.position = 'absolute';
-        video.style.visibility = 'hidden';
-        video.style.width = '0';
-        video.style.height = '0';
-        video.style.opacity = '0';
-        video.style.pointerEvents = 'none';
-        container.appendChild(video);
-        return video;
-    }
-
     function handleFile(file) {
         console.log('handleFile called with:', file ? file.name : 'null');
         
@@ -647,7 +594,7 @@
         fileNameDisplay.innerHTML = `🎬 ${file.name}`;
         fileInfoDisplay.innerHTML = `📊 Size: ${formatFileSize(file.size)} | 📹 Type: ${fileType}`;
         
-        setStatus(`✅ Loaded: ${file.name} (${sizeMB} MB). Ready to compress. No preview will be shown.`, 'success');
+        setStatus(`✅ Loaded: ${file.name} (${sizeMB} MB). Ready to compress. Video will be processed silently with NO playback.`, 'success');
         
         compressBtn.disabled = false;
         downloadBtn.disabled = true;
@@ -655,6 +602,12 @@
         progressContainer.style.display = 'none';
     }
 
+    // Helper: sleep function for frame timing
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Compress video WITHOUT playing it - using seek and capture
     async function compressVideo() {
         if (!originalVideoFile) {
             setStatus('⚠️ Please upload a video file first.', 'error');
@@ -676,17 +629,28 @@
         const removeAudioTrack = removeAudio.checked;
         const fastEncoding = fastMode.checked;
         
-        updateProgress(5, 'Loading video (no preview)...');
-        setStatus(`🔄 Compressing video... This may take a while. No preview shown.`, 'info');
+        updateProgress(5, 'Loading video metadata (silent mode)...');
+        setStatus(`🔄 Compressing video silently... No playback occurs. This may take a while.`, 'info');
 
         try {
-            // Create hidden video element (no visual preview)
-            const video = createHiddenVideo();
-            video.src = originalVideoUrl;
+            // Create temporary video element - will NOT be played
+            const video = document.createElement('video');
+            video.preload = 'auto';
             video.muted = true;
             video.crossOrigin = 'anonymous';
+            video.setAttribute('playsinline', 'true');
+            video.style.display = 'none';
+            video.style.position = 'absolute';
+            video.style.visibility = 'hidden';
+            video.style.width = '0';
+            video.style.height = '0';
+            video.style.opacity = '0';
+            video.style.pointerEvents = 'none';
+            document.body.appendChild(video);
             
-            // Wait for video metadata without showing anything
+            video.src = originalVideoUrl;
+            
+            // Wait for metadata without playing
             await new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => reject(new Error('Video loading timeout')), 15000);
                 video.onloadedmetadata = () => {
@@ -702,21 +666,25 @@
             
             const originalWidth = video.videoWidth;
             const originalHeight = video.videoHeight;
+            const duration = video.duration;
             const newWidth = Math.floor(originalWidth * scale);
             const newHeight = Math.floor(originalHeight * scale);
+            const fps = 30; // Target frames per second
             
             if (newWidth < 16 || newHeight < 16) {
                 throw new Error('Resolution too small after scaling');
             }
             
-            updateProgress(15, `Scaling to ${newWidth}x${newHeight} (processing in background)`);
+            updateProgress(15, `Scaling to ${newWidth}x${newHeight} (silent processing)`);
             
-            // Setup canvas (also hidden, no visual feedback)
+            // Setup canvas for capturing frames (hidden)
             const canvas = document.createElement('canvas');
             canvas.width = newWidth;
             canvas.height = newHeight;
             const ctx = canvas.getContext('2d');
-            const stream = canvas.captureStream(30);
+            
+            // Create media stream from canvas
+            const stream = canvas.captureStream(fps);
             
             // Determine MIME type
             let mimeType = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
@@ -744,42 +712,77 @@
                 if (event.data && event.data.size > 0) chunks.push(event.data);
             };
             
-            // Start processing - NO VISUAL PREVIEW
-            video.currentTime = 0;
-            await video.play();
+            // Start recording BEFORE processing frames
+            mediaRecorder.start(100);
             
-            const duration = video.duration;
-            const processFrame = () => {
-                if (video.paused || video.ended) return;
-                // Draw frame to hidden canvas (no preview)
-                ctx.drawImage(video, 0, 0, newWidth, newHeight);
-                const progressPercent = (video.currentTime / duration) * 100;
-                updateProgress(20 + progressPercent * 0.7, `Encoding in background: ${Math.floor(progressPercent)}% (no preview)`);
-                requestAnimationFrame(processFrame);
-            };
+            // Calculate frame timing
+            const totalFrames = Math.ceil(duration * fps);
+            let frameIndex = 0;
             
-            mediaRecorder.start(250);
-            processFrame();
+            updateProgress(20, `Processing ${totalFrames} frames silently...`);
             
-            // Wait for video to complete
-            await new Promise((resolve) => {
-                video.onended = () => {
-                    setTimeout(() => {
-                        if (mediaRecorder.state === 'recording') mediaRecorder.stop();
+            // Process frames by seeking - NO PLAYBACK
+            for (let frame = 0; frame < totalFrames; frame++) {
+                const currentTime = frame / fps;
+                if (currentTime > duration) break;
+                
+                // Seek to exact timestamp without playing
+                video.currentTime = currentTime;
+                
+                // Wait for seek to complete and frame to be ready
+                await new Promise((resolve) => {
+                    const seekHandler = () => {
+                        video.removeEventListener('seeked', seekHandler);
                         resolve();
-                    }, 500);
-                };
-            });
+                    };
+                    video.addEventListener('seeked', seekHandler);
+                    if (video.currentTime === currentTime) {
+                        video.removeEventListener('seeked', seekHandler);
+                        resolve();
+                    }
+                });
+                
+                // Draw the current frame to canvas
+                ctx.drawImage(video, 0, 0, newWidth, newHeight);
+                
+                frameIndex++;
+                
+                // Update progress
+                const percent = 20 + (frameIndex / totalFrames) * 70;
+                updateProgress(percent, `Processing frame ${frameIndex}/${totalFrames} (silent, no playback)`);
+                
+                // Small delay to prevent overwhelming the system
+                if (frameIndex % 10 === 0) {
+                    await sleep(5);
+                }
+            }
             
+            updateProgress(92, 'Finalizing recording...');
+            
+            // Stop recording after all frames are processed
+            await sleep(200);
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            
+            // Wait for final data
             await new Promise((resolve) => {
-                if (mediaRecorder.state === 'inactive') resolve();
-                else mediaRecorder.onstop = () => resolve();
+                if (mediaRecorder.state === 'inactive') {
+                    resolve();
+                } else {
+                    mediaRecorder.onstop = () => resolve();
+                }
             });
             
-            updateProgress(95, 'Building final file...');
+            updateProgress(96, 'Building compressed file...');
+            
+            // Create compressed blob
+            if (chunks.length === 0) {
+                throw new Error('No data was recorded');
+            }
             compressedBlob = new Blob(chunks, { type: selectedMimeType });
             
-            // Clean up hidden video
+            // Clean up
             video.pause();
             video.src = '';
             video.remove();
@@ -789,7 +792,7 @@
             const savedPercent = ((1 - compressedBlob.size / originalVideoFile.size) * 100).toFixed(1);
             
             updateProgress(100, `Complete! ${originalSize} → ${newSize}`);
-            setStatus(`✅ Success! Size reduced from ${originalSize} to ${newSize} (${savedPercent}% smaller)`, 'success');
+            setStatus(`✅ Success! Size reduced from ${originalSize} to ${newSize} (${savedPercent}% smaller) - NO VIDEO PLAYBACK occurred.`, 'success');
             downloadBtn.disabled = false;
             
         } catch (err) {
@@ -833,10 +836,6 @@
         setStatus("🧹 Cleared. All data wiped from memory.", 'info');
         progressContainer.style.display = 'none';
         fileInput.value = '';
-        
-        // Clean up any hidden video elements
-        const hiddenContainer = document.querySelector('.hidden-video');
-        if (hiddenContainer) hiddenContainer.innerHTML = '';
     }
 
     // Event listeners
@@ -875,8 +874,8 @@
     downloadBtn.addEventListener('click', downloadVideo);
     clearBtn.addEventListener('click', clearAll);
     
-    setStatus('📌 Ready — No cache, no site data, no video preview during compression. Your privacy is protected.', 'info');
-    console.log('Video Compressor - Privacy Mode: No preview, no storage');
+    setStatus('📌 Ready — No cache, no site data, NO VIDEO PLAYBACK during compression. Your privacy is fully protected.', 'info');
+    console.log('Video Compressor - Complete Privacy Mode: No playback, no storage, no preview');
 </script>
 </body>
 </html>
