@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · No Playback · Created by Mahmoud Hamouda</title>
+    <title>Video Tools Hub · Compression & Converter · Created by Mahmoud Hamouda</title>
     <!-- Anti-cache meta tags -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="format-detection" content="telephone=no">
     <style>
         * {
             margin: 0;
@@ -24,8 +23,61 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1300px;
             margin: 0 auto;
+        }
+
+        /* Dashboard Navigation */
+        .dashboard-nav {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 60px;
+            padding: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        .nav-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.35);
+            transform: translateY(-2px);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .card {
@@ -44,7 +96,7 @@
         }
 
         .header h1 {
-            font-size: 2rem;
+            font-size: 1.9rem;
             margin-bottom: 8px;
         }
 
@@ -60,18 +112,6 @@
             padding: 4px 14px;
             font-size: 0.7rem;
             margin-top: 10px;
-        }
-
-        .no-cache-badge {
-            background: #10b981;
-            color: white;
-            margin-left: 8px;
-        }
-
-        .no-playback-badge {
-            background: #ef4444;
-            color: white;
-            margin-left: 8px;
         }
 
         .creator-tag {
@@ -120,23 +160,12 @@
             color: #1e293b;
             word-break: break-word;
             margin-top: 8px;
-            font-size: 1rem;
         }
 
         .file-info {
             font-size: 0.75rem;
             color: #64748b;
             margin-top: 8px;
-        }
-
-        .format-badge {
-            background: #eef2ff;
-            border-radius: 40px;
-            padding: 6px 16px;
-            font-size: 0.75rem;
-            display: inline-block;
-            margin-top: 12px;
-            color: #1e40af;
         }
 
         .settings-grid {
@@ -173,11 +202,6 @@
             outline: none;
         }
 
-        select:focus, input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-        }
-
         .action-buttons {
             display: flex;
             flex-wrap: wrap;
@@ -190,7 +214,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 32px;
+            padding: 12px 28px;
             border-radius: 50px;
             font-weight: 700;
             font-size: 0.95rem;
@@ -206,9 +230,8 @@
         }
 
         button:disabled {
-            opacity: 0.5;
+            opacity: 0.55;
             cursor: not-allowed;
-            transform: none;
         }
 
         .progress-container {
@@ -235,7 +258,6 @@
             margin-top: 10px;
             font-size: 0.8rem;
             color: #475569;
-            font-weight: 500;
         }
 
         .status-area {
@@ -256,18 +278,6 @@
         .status-error {
             background: #fee2e2;
             color: #b91c1c;
-        }
-
-        .status-warning {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .info-note {
-            font-size: 0.7rem;
-            text-align: center;
-            margin-top: 16px;
-            color: #64748b;
         }
 
         .contact-bar {
@@ -337,545 +347,539 @@
             .contact-bar { flex-direction: column; text-align: center; }
             .creator-tag { position: static; margin-top: 10px; display: inline-block; }
             .header { padding-bottom: 20px; }
+            .dashboard-nav { border-radius: 30px; }
+            .nav-btn { padding: 8px 20px; font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="card">
-        <div class="header">
-            <h1>🎬 Universal Video Compressor</h1>
-            <p>MP4 · MOV · AVI · MKV · WebM · All formats supported</p>
-            <div class="badge">⚡ 100% local · No upload · Privacy guaranteed</div>
-            <div class="badge no-cache-badge">🔒 NO CACHE · NO SITE DATA</div>
-            <div class="badge no-playback-badge">🚫 NO VIDEO PLAYBACK · SILENT PROCESSING</div>
-            <div class="creator-tag">Created by Mahmoud Hamouda</div>
+    <!-- Dashboard Navigation -->
+    <div class="dashboard-nav">
+        <button class="nav-btn active" data-page="compressor">🎬 Video Compressor</button>
+        <button class="nav-btn" data-page="converter">🔄 Video Format Converter</button>
+    </div>
+
+    <!-- Video Compressor Page -->
+    <div id="compressor-page" class="page active-page">
+        <div class="card">
+            <div class="header">
+                <h1>🎬 Video Compressor</h1>
+                <p>Reduce file size · Maintain quality · Silent processing</p>
+                <div class="badge">⚡ No cache · No playback · Privacy first</div>
+                <div class="creator-tag">Created by Mahmoud Hamouda</div>
+            </div>
+            <div class="content">
+                <div class="privacy-note">
+                    🔐 <strong>Privacy Mode:</strong> No cache, no localStorage, NO VIDEO PLAYBACK during compression.
+                </div>
+
+                <div class="upload-area" id="compressorUploadZone">
+                    <div class="upload-icon">🎥📁</div>
+                    <div class="file-name" id="compressorFileName">Click or drag video file here</div>
+                    <div class="file-info" id="compressorFileInfo"></div>
+                    <input type="file" id="compressorFileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/*">
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <div class="setting-label">🎯 Compression Level</div>
+                        <select id="qualityPreset">
+                            <option value="ultra">🚀 Ultra Compression</option>
+                            <option value="high" selected>⚡ High Compression</option>
+                            <option value="medium">📀 Medium Compression</option>
+                            <option value="light">✨ Light Compression</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">📐 Resolution Scale</div>
+                        <select id="resolutionScale">
+                            <option value="1">100% (original)</option>
+                            <option value="0.85" selected>85% (recommended)</option>
+                            <option value="0.7">70%</option>
+                            <option value="0.5">50%</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">🎬 Output Format</div>
+                        <select id="outputFormat">
+                            <option value="mp4">MP4</option>
+                            <option value="webm">WebM</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">⚙️ Options</div>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                            <input type="checkbox" id="removeAudioCompress"> 🔇 Remove audio
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px;">
+                            <input type="checkbox" id="fastModeCompress"> ⚡ Fast mode
+                        </label>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="compressBtn" disabled>🎬 Compress Video</button>
+                    <button id="downloadCompressBtn" disabled>💾 Download</button>
+                    <button id="clearCompressBtn" class="secondary">🗑️ Clear</button>
+                </div>
+
+                <div class="progress-container" id="compressProgress">
+                    <div class="progress-bar"><div class="progress-fill" id="compressProgressFill"></div></div>
+                    <div class="progress-text" id="compressProgressText">Ready</div>
+                </div>
+                <div class="status-area" id="compressStatus">📌 Ready — Upload a video to compress</div>
+            </div>
+            <div class="contact-bar">
+                <div class="credit">👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024</div>
+                <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link">💬 Contact on WhatsApp</a>
+            </div>
+            <footer>🔒 100% local · No cache · No video playback</footer>
         </div>
-        <div class="content">
-            <div class="privacy-note">
-                🔐 <strong>Privacy Mode Active:</strong> No cache, no localStorage, no IndexedDB, <strong>NO VIDEO PLAYBACK</strong> during compression.
-                Videos are processed silently in the background without any visual or audio output.
-            </div>
+    </div>
 
-            <div class="upload-area" id="uploadZone">
-                <div class="upload-icon">🎥📁</div>
-                <div class="file-name" id="fileNameDisplay">Click or drag video file here</div>
-                <div class="file-info" id="fileInfoDisplay"></div>
-                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/*" style="display: block; margin: 20px auto 0; width: auto; max-width: 100%;">
-                <div class="format-badge">🔒 Supports MP4, AVI, MOV, MKV, WebM, FLV, WMV</div>
+    <!-- Video Format Converter Page -->
+    <div id="converter-page" class="page">
+        <div class="card">
+            <div class="header">
+                <h1>🔄 Video Format Converter</h1>
+                <p>Convert between MP4, WebM, MOV, AVI, MKV · Fast & Local</p>
+                <div class="badge">⚡ No upload · Privacy guaranteed</div>
+                <div class="creator-tag">Created by Mahmoud Hamouda</div>
             </div>
-
-            <div class="settings-grid">
-                <div class="setting-card">
-                    <div class="setting-label">🎯 Compression Level</div>
-                    <select id="qualityPreset">
-                        <option value="ultra">🚀 Ultra Compression (smallest file)</option>
-                        <option value="high" selected>⚡ High Compression (recommended)</option>
-                        <option value="medium">📀 Medium Compression</option>
-                        <option value="light">✨ Light Compression (minimal loss)</option>
-                    </select>
+            <div class="content">
+                <div class="privacy-note">
+                    🔐 <strong>Privacy Mode:</strong> No cache, no localStorage. All conversion happens locally.
                 </div>
 
-                <div class="setting-card">
-                    <div class="setting-label">📐 Resolution Scale</div>
-                    <select id="resolutionScale">
-                        <option value="1">100% (original resolution)</option>
-                        <option value="0.85" selected>85% (slight reduction)</option>
-                        <option value="0.7">70% (good balance)</option>
-                        <option value="0.5">50% (half resolution)</option>
-                        <option value="0.35">35% (small video)</option>
-                    </select>
+                <div class="upload-area" id="converterUploadZone">
+                    <div class="upload-icon">🔄📁</div>
+                    <div class="file-name" id="converterFileName">Click or drag video file here</div>
+                    <div class="file-info" id="converterFileInfo"></div>
+                    <input type="file" id="converterFileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/*">
                 </div>
 
-                <div class="setting-card">
-                    <div class="setting-label">🎬 Output Format</div>
-                    <select id="outputFormat">
-                        <option value="mp4">MP4 (best compatibility)</option>
-                        <option value="webm">WebM (smaller size)</option>
-                    </select>
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <div class="setting-label">📤 Convert From</div>
+                        <select id="convertFrom" disabled>
+                            <option>Auto-detected</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">📥 Convert To</div>
+                        <select id="convertTo">
+                            <option value="mp4">MP4 (H.264/AAC)</option>
+                            <option value="webm">WebM (VP9/Opus)</option>
+                            <option value="mov">MOV (QuickTime)</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">🎨 Quality</div>
+                        <select id="convertQuality">
+                            <option value="high">High Quality (slower)</option>
+                            <option value="medium" selected>Medium Quality</option>
+                            <option value="low">Low Quality (smaller)</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="setting-card">
-                    <div class="setting-label">⚙️ Advanced Options</div>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="removeAudio"> 🔇 Remove audio track
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px;">
-                        <input type="checkbox" id="fastMode"> ⚡ Fast mode (lower efficiency)
-                    </label>
+                <div class="action-buttons">
+                    <button id="convertBtn" disabled>🔄 Convert Video</button>
+                    <button id="downloadConvertBtn" disabled>💾 Download</button>
+                    <button id="clearConvertBtn" class="secondary">🗑️ Clear</button>
                 </div>
-            </div>
 
-            <div class="action-buttons">
-                <button id="compressBtn" disabled>🎬 Compress Video (Silent)</button>
-                <button id="downloadBtn" disabled>💾 Download Result</button>
-                <button id="clearBtn" class="secondary">🗑️ Clear All</button>
-            </div>
-
-            <div class="progress-container" id="progressContainer">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                <div class="progress-container" id="convertProgress">
+                    <div class="progress-bar"><div class="progress-fill" id="convertProgressFill"></div></div>
+                    <div class="progress-text" id="convertProgressText">Ready</div>
                 </div>
-                <div class="progress-text" id="progressText">Ready</div>
+                <div class="status-area" id="convertStatus">📌 Ready — Upload a video to convert</div>
             </div>
-
-            <div class="status-area" id="statusMsg">
-                📌 Ready — Click the "Browse" button above or drag a video file to begin
+            <div class="contact-bar">
+                <div class="credit">👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024</div>
+                <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link">💬 Contact on WhatsApp</a>
             </div>
-            <div class="info-note">
-                💡 Works with MP4, WebM, AVI, MOV, MKV. <strong>No video playback occurs during compression</strong> — processing is completely silent.
-                Refresh the page = complete data wipe.
-            </div>
+            <footer>🔒 100% local conversion · No data upload</footer>
         </div>
-
-        <div class="contact-bar">
-            <div class="credit">
-                👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024 All rights reserved
-            </div>
-            <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link" id="whatsappLink">
-                💬 Contact on WhatsApp
-            </a>
-        </div>
-        <footer>
-            🔒 100% local processing · NO VIDEO PLAYBACK · NO CACHE · NO SITE DATA STORED
-        </footer>
     </div>
 </div>
 
 <script>
     // ============================================
-    // COMPLETE CACHE & SITE DATA PREVENTION
+    // CACHE PREVENTION
     // ============================================
-    
-    Storage.prototype.getItem = function() { console.warn('[Privacy] localStorage blocked'); return null; };
-    Storage.prototype.setItem = function() { console.warn('[Privacy] localStorage blocked'); return; };
-    Storage.prototype.removeItem = function() { console.warn('[Privacy] localStorage blocked'); return; };
-    Storage.prototype.clear = function() { console.warn('[Privacy] localStorage blocked'); return; };
-    
+    Storage.prototype.getItem = function() { return null; };
+    Storage.prototype.setItem = function() { return; };
+    Storage.prototype.removeItem = function() { return; };
+    Storage.prototype.clear = function() { return; };
     sessionStorage.getItem = function() { return null; };
     sessionStorage.setItem = function() { return; };
-    sessionStorage.removeItem = function() { return; };
-    sessionStorage.clear = function() { return; };
-    
-    if (window.indexedDB) {
-        window.indexedDB.open = function() { throw new DOMException('IndexedDB disabled'); };
-        window.indexedDB.deleteDatabase = function() { return; };
-    }
-    
-    if (window.caches) {
-        window.caches.open = async function() { throw new Error('Cache disabled'); };
-        window.caches.keys = async () => [];
-    }
-    
-    const originalFetch = window.fetch;
-    window.fetch = function(...args) {
-        const options = args[1] || {};
-        options.cache = 'no-store';
-        options.headers = { ...options.headers, 'Cache-Control': 'no-cache, no-store' };
-        return originalFetch.call(this, args[0], options);
-    };
-    
+    if (window.indexedDB) window.indexedDB.open = function() { return null; };
+    if (window.caches) window.caches.open = async () => { throw new Error('Cache disabled'); };
     try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
-    
-    if (navigator.serviceWorker && navigator.serviceWorker.register) {
-        navigator.serviceWorker.register = function() {
-            return Promise.reject(new Error('ServiceWorker disabled'));
-        };
-    }
-    
-    console.log('[Privacy] All cache/storage disabled - NO VIDEO PLAYBACK during compression');
-    
+
     // ============================================
-    // VIDEO COMPRESSOR - NO PLAYBACK VERSION
-    // Uses seek() and capture frames without playing the video
+    // PAGE NAVIGATION
     // ============================================
-    
-    let originalVideoFile = null;
-    let originalVideoUrl = null;
-    let compressedBlob = null;
-    let isCompressing = false;
-
-    // DOM elements
-    const uploadZone = document.getElementById('uploadZone');
-    const fileInput = document.getElementById('fileInput');
-    const fileNameDisplay = document.getElementById('fileNameDisplay');
-    const fileInfoDisplay = document.getElementById('fileInfoDisplay');
-    const compressBtn = document.getElementById('compressBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const qualityPreset = document.getElementById('qualityPreset');
-    const resolutionScale = document.getElementById('resolutionScale');
-    const outputFormat = document.getElementById('outputFormat');
-    const removeAudio = document.getElementById('removeAudio');
-    const fastMode = document.getElementById('fastMode');
-    const statusDiv = document.getElementById('statusMsg');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-    const whatsappLink = document.getElementById('whatsappLink');
-
-    // WhatsApp API
-    const whatsappNumber = "966564700174";
-    whatsappLink.href = `https://wa.me/${whatsappNumber}?text=Hello%20Mahmoud%20Hamouda%2C%20I%20have%20a%20question%20about%20the%20Video%20Compressor%20tool.`;
-
-    function setStatus(msg, type = 'info') {
-        console.log('[Status]', msg);
-        statusDiv.textContent = msg;
-        statusDiv.classList.remove('status-success', 'status-error', 'status-warning');
-        if (type === 'success') statusDiv.classList.add('status-success');
-        else if (type === 'error') statusDiv.classList.add('status-error');
-        else if (type === 'warning') statusDiv.classList.add('status-warning');
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
+        document.getElementById(`${pageId}-page`).classList.add('active-page');
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.page === pageId) btn.classList.add('active');
+        });
     }
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchPage(btn.dataset.page));
+    });
 
-    function updateProgress(percent, text) {
-        if (progressContainer.style.display === 'none') {
-            progressContainer.style.display = 'block';
-        }
-        const clampedPercent = Math.min(100, Math.max(0, percent));
-        progressFill.style.width = `${clampedPercent}%`;
-        progressText.textContent = text || `${Math.round(clampedPercent)}%`;
-        
-        if (clampedPercent >= 100) {
-            setTimeout(() => {
-                if (!isCompressing) {
-                    progressContainer.style.display = 'none';
-                }
-            }, 2000);
-        }
-    }
-
+    // ============================================
+    // HELPER FUNCTIONS
+    // ============================================
     function formatFileSize(bytes) {
-        if (bytes === 0) return '0 Bytes';
         if (!bytes) return 'Unknown';
-        const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        const i = Math.floor(Math.log(bytes) / Math.log(1024));
+        return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    function getBitrate() {
-        const preset = qualityPreset.value;
-        switch(preset) {
-            case 'ultra': return 300000;
-            case 'high': return 800000;
-            case 'medium': return 1500000;
-            case 'light': return 2500000;
-            default: return 800000;
-        }
+    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    // ============================================
+    // VIDEO COMPRESSOR (SILENT, NO PLAYBACK)
+    // ============================================
+    let compressorFile = null, compressorUrl = null, compressedBlob = null, isCompressing = false;
+    
+    const compUploadZone = document.getElementById('compressorUploadZone');
+    const compFileInput = document.getElementById('compressorFileInput');
+    const compFileName = document.getElementById('compressorFileName');
+    const compFileInfo = document.getElementById('compressorFileInfo');
+    const compressBtn = document.getElementById('compressBtn');
+    const downloadCompressBtn = document.getElementById('downloadCompressBtn');
+    const clearCompressBtn = document.getElementById('clearCompressBtn');
+    const compressStatus = document.getElementById('compressStatus');
+    const compressProgress = document.getElementById('compressProgress');
+    const compressProgressFill = document.getElementById('compressProgressFill');
+    const compressProgressText = document.getElementById('compressProgressText');
+
+    function setCompressStatus(msg, isError = false, isSuccess = false) {
+        compressStatus.textContent = msg;
+        compressStatus.className = 'status-area';
+        if (isSuccess) compressStatus.classList.add('status-success');
+        if (isError) compressStatus.classList.add('status-error');
     }
 
-    function getScale() {
-        return parseFloat(resolutionScale.value);
+    function updateCompressProgress(percent, text) {
+        compressProgress.style.display = 'block';
+        compressProgressFill.style.width = `${Math.min(100, percent)}%`;
+        compressProgressText.textContent = text || `${Math.round(percent)}%`;
+        if (percent >= 100) setTimeout(() => compressProgress.style.display = 'none', 2000);
     }
 
-    function handleFile(file) {
-        console.log('handleFile called with:', file ? file.name : 'null');
-        
-        if (!file) {
-            setStatus('❌ No file selected. Please choose a video file.', 'error');
+    function handleCompressorFile(file) {
+        if (!file || !file.type.startsWith('video/')) {
+            setCompressStatus('❌ Please select a valid video file', true);
             return;
         }
-        
-        if (!file.type.startsWith('video/')) {
-            setStatus(`❌ "${file.name}" is not a video file.`, 'error');
-            return;
-        }
-        
-        if (originalVideoUrl) {
-            URL.revokeObjectURL(originalVideoUrl);
-        }
-        
-        originalVideoFile = file;
-        originalVideoUrl = URL.createObjectURL(file);
-        
-        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        const fileType = file.type.split('/')[1]?.toUpperCase() || file.name.split('.').pop().toUpperCase();
-        
-        fileNameDisplay.innerHTML = `🎬 ${file.name}`;
-        fileInfoDisplay.innerHTML = `📊 Size: ${formatFileSize(file.size)} | 📹 Type: ${fileType}`;
-        
-        setStatus(`✅ Loaded: ${file.name} (${sizeMB} MB). Ready to compress. Video will be processed silently with NO playback.`, 'success');
-        
+        if (compressorUrl) URL.revokeObjectURL(compressorUrl);
+        compressorFile = file;
+        compressorUrl = URL.createObjectURL(file);
+        compFileName.innerHTML = `🎬 ${file.name}`;
+        compFileInfo.innerHTML = `📊 Size: ${formatFileSize(file.size)} | Type: ${file.type.split('/')[1]?.toUpperCase()}`;
+        setCompressStatus(`✅ Loaded: ${file.name}. Ready to compress.`, false);
         compressBtn.disabled = false;
-        downloadBtn.disabled = true;
+        downloadCompressBtn.disabled = true;
         compressedBlob = null;
-        progressContainer.style.display = 'none';
     }
 
-    // Helper: sleep function for frame timing
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    // Compress video WITHOUT playing it - using seek and capture
     async function compressVideo() {
-        if (!originalVideoFile) {
-            setStatus('⚠️ Please upload a video file first.', 'error');
-            return;
-        }
-
-        if (isCompressing) {
-            setStatus('⏳ Compression already in progress...', 'warning');
-            return;
-        }
-
+        if (!compressorFile) { setCompressStatus('⚠️ Upload a video first', true); return; }
+        if (isCompressing) return;
         isCompressing = true;
         compressBtn.disabled = true;
-        downloadBtn.disabled = true;
+        downloadCompressBtn.disabled = true;
         
-        const bitrate = getBitrate();
-        const scale = getScale();
-        const outputExt = outputFormat.value;
-        const removeAudioTrack = removeAudio.checked;
-        const fastEncoding = fastMode.checked;
+        const quality = document.getElementById('qualityPreset').value;
+        const scale = parseFloat(document.getElementById('resolutionScale').value);
+        const outputExt = document.getElementById('outputFormat').value;
+        const removeAudio = document.getElementById('removeAudioCompress').checked;
+        const fastMode = document.getElementById('fastModeCompress').checked;
         
-        updateProgress(5, 'Loading video metadata (silent mode)...');
-        setStatus(`🔄 Compressing video silently... No playback occurs. This may take a while.`, 'info');
-
+        let bitrate = { ultra: 300000, high: 800000, medium: 1500000, light: 2500000 }[quality];
+        if (fastMode) bitrate = bitrate * 0.8;
+        
+        updateCompressProgress(5, 'Loading video (silent mode)...');
+        setCompressStatus('🔄 Compressing silently... No playback.');
+        
         try {
-            // Create temporary video element - will NOT be played
             const video = document.createElement('video');
-            video.preload = 'auto';
+            video.src = compressorUrl;
             video.muted = true;
-            video.crossOrigin = 'anonymous';
-            video.setAttribute('playsinline', 'true');
             video.style.display = 'none';
-            video.style.position = 'absolute';
-            video.style.visibility = 'hidden';
-            video.style.width = '0';
-            video.style.height = '0';
-            video.style.opacity = '0';
-            video.style.pointerEvents = 'none';
             document.body.appendChild(video);
             
-            video.src = originalVideoUrl;
-            
-            // Wait for metadata without playing
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error('Video loading timeout')), 15000);
-                video.onloadedmetadata = () => {
-                    clearTimeout(timeout);
-                    resolve();
-                };
-                video.onerror = () => {
-                    clearTimeout(timeout);
-                    reject(new Error('Failed to load video metadata'));
-                };
+                video.onloadedmetadata = resolve;
+                video.onerror = reject;
                 video.load();
             });
             
-            const originalWidth = video.videoWidth;
-            const originalHeight = video.videoHeight;
             const duration = video.duration;
-            const newWidth = Math.floor(originalWidth * scale);
-            const newHeight = Math.floor(originalHeight * scale);
-            const fps = 30; // Target frames per second
+            const newWidth = Math.floor(video.videoWidth * scale);
+            const newHeight = Math.floor(video.videoHeight * scale);
+            const fps = 30;
             
-            if (newWidth < 16 || newHeight < 16) {
-                throw new Error('Resolution too small after scaling');
-            }
-            
-            updateProgress(15, `Scaling to ${newWidth}x${newHeight} (silent processing)`);
-            
-            // Setup canvas for capturing frames (hidden)
             const canvas = document.createElement('canvas');
             canvas.width = newWidth;
             canvas.height = newHeight;
             const ctx = canvas.getContext('2d');
-            
-            // Create media stream from canvas
             const stream = canvas.captureStream(fps);
             
-            // Determine MIME type
             let mimeType = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
-            const mimeTypes = [mimeType, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
+            const mimeTypes = [mimeType, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus'];
+            let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || mimeTypes[0];
             
-            let selectedMimeType = null;
-            for (const type of mimeTypes) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    selectedMimeType = type;
-                    break;
-                }
-            }
-            
-            if (!selectedMimeType) throw new Error('Your browser does not support video recording');
-            
-            const options = {
-                mimeType: selectedMimeType,
-                videoBitsPerSecond: fastEncoding ? bitrate * 0.8 : bitrate
-            };
-            
-            const mediaRecorder = new MediaRecorder(stream, options);
+            const recorder = new MediaRecorder(stream, { mimeType: selectedMime, videoBitsPerSecond: bitrate });
             const chunks = [];
+            recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+            recorder.start(100);
             
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data && event.data.size > 0) chunks.push(event.data);
-            };
-            
-            // Start recording BEFORE processing frames
-            mediaRecorder.start(100);
-            
-            // Calculate frame timing
             const totalFrames = Math.ceil(duration * fps);
-            let frameIndex = 0;
-            
-            updateProgress(20, `Processing ${totalFrames} frames silently...`);
-            
-            // Process frames by seeking - NO PLAYBACK
             for (let frame = 0; frame < totalFrames; frame++) {
-                const currentTime = frame / fps;
-                if (currentTime > duration) break;
-                
-                // Seek to exact timestamp without playing
-                video.currentTime = currentTime;
-                
-                // Wait for seek to complete and frame to be ready
-                await new Promise((resolve) => {
-                    const seekHandler = () => {
-                        video.removeEventListener('seeked', seekHandler);
-                        resolve();
-                    };
-                    video.addEventListener('seeked', seekHandler);
-                    if (video.currentTime === currentTime) {
-                        video.removeEventListener('seeked', seekHandler);
-                        resolve();
-                    }
-                });
-                
-                // Draw the current frame to canvas
+                const time = frame / fps;
+                if (time > duration) break;
+                video.currentTime = time;
+                await new Promise(r => { video.onseeked = r; if (video.currentTime === time) r(); });
                 ctx.drawImage(video, 0, 0, newWidth, newHeight);
-                
-                frameIndex++;
-                
-                // Update progress
-                const percent = 20 + (frameIndex / totalFrames) * 70;
-                updateProgress(percent, `Processing frame ${frameIndex}/${totalFrames} (silent, no playback)`);
-                
-                // Small delay to prevent overwhelming the system
-                if (frameIndex % 10 === 0) {
-                    await sleep(5);
-                }
+                updateCompressProgress(20 + (frame / totalFrames) * 75, `Frame ${frame+1}/${totalFrames}`);
+                if (frame % 15 === 0) await sleep(5);
             }
             
-            updateProgress(92, 'Finalizing recording...');
+            recorder.stop();
+            await new Promise(r => recorder.onstop = r);
             
-            // Stop recording after all frames are processed
-            await sleep(200);
-            if (mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-            }
-            
-            // Wait for final data
-            await new Promise((resolve) => {
-                if (mediaRecorder.state === 'inactive') {
-                    resolve();
-                } else {
-                    mediaRecorder.onstop = () => resolve();
-                }
-            });
-            
-            updateProgress(96, 'Building compressed file...');
-            
-            // Create compressed blob
-            if (chunks.length === 0) {
-                throw new Error('No data was recorded');
-            }
-            compressedBlob = new Blob(chunks, { type: selectedMimeType });
-            
-            // Clean up
-            video.pause();
-            video.src = '';
+            compressedBlob = new Blob(chunks, { type: selectedMime });
             video.remove();
             
-            const originalSize = formatFileSize(originalVideoFile.size);
-            const newSize = formatFileSize(compressedBlob.size);
-            const savedPercent = ((1 - compressedBlob.size / originalVideoFile.size) * 100).toFixed(1);
-            
-            updateProgress(100, `Complete! ${originalSize} → ${newSize}`);
-            setStatus(`✅ Success! Size reduced from ${originalSize} to ${newSize} (${savedPercent}% smaller) - NO VIDEO PLAYBACK occurred.`, 'success');
-            downloadBtn.disabled = false;
-            
+            const saved = ((1 - compressedBlob.size / compressorFile.size) * 100).toFixed(1);
+            updateCompressProgress(100, `Done! ${formatFileSize(compressorFile.size)} → ${formatFileSize(compressedBlob.size)}`);
+            setCompressStatus(`✅ Success! ${saved}% smaller. Download ready.`, false, true);
+            downloadCompressBtn.disabled = false;
         } catch (err) {
-            console.error('Compression error:', err);
-            setStatus(`❌ Compression failed: ${err.message}`, 'error');
-            compressedBlob = null;
-            progressContainer.style.display = 'none';
+            setCompressStatus(`❌ Error: ${err.message}`, true);
         } finally {
             isCompressing = false;
-            if (originalVideoFile) compressBtn.disabled = false;
+            if (compressorFile) compressBtn.disabled = false;
         }
     }
 
-    function downloadVideo() {
-        if (!compressedBlob) {
-            setStatus('⚠️ No compressed video. Please compress first.', 'error');
-            return;
-        }
-        const ext = outputFormat.value;
-        const originalName = originalVideoFile?.name.replace(/\.[^/.]+$/, '') || 'compressed_video';
-        const downloadName = `${originalName}_compressed_${Date.now()}.${ext}`;
+    function downloadCompressed() {
+        if (!compressedBlob) return;
+        const ext = document.getElementById('outputFormat').value;
         const url = URL.createObjectURL(compressedBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = downloadName;
+        a.download = `${compressorFile.name.replace(/\.[^/.]+$/, '')}_compressed.${ext}`;
         a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 100);
-        setStatus(`📥 Download started: ${downloadName}`, 'success');
+        URL.revokeObjectURL(url);
+        setCompressStatus('📥 Download started', false);
     }
 
-    function clearAll() {
-        if (originalVideoUrl) URL.revokeObjectURL(originalVideoUrl);
-        originalVideoFile = null;
-        originalVideoUrl = null;
+    function clearCompressor() {
+        if (compressorUrl) URL.revokeObjectURL(compressorUrl);
+        compressorFile = null;
         compressedBlob = null;
-        isCompressing = false;
-        fileNameDisplay.innerHTML = "Click or drag video file here";
-        fileInfoDisplay.innerHTML = "";
+        compFileName.innerHTML = 'Click or drag video file here';
+        compFileInfo.innerHTML = '';
         compressBtn.disabled = true;
-        downloadBtn.disabled = true;
-        setStatus("🧹 Cleared. All data wiped from memory.", 'info');
-        progressContainer.style.display = 'none';
-        fileInput.value = '';
+        downloadCompressBtn.disabled = true;
+        setCompressStatus('🧹 Cleared. Upload a new video.');
+        compressProgress.style.display = 'none';
+        compFileInput.value = '';
     }
 
-    // Event listeners
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
-    });
-    
-    uploadZone.addEventListener('click', (e) => {
-        if (e.target !== fileInput) fileInput.click();
-    });
-    
-    uploadZone.addEventListener('dragover', (e) => {
+    compUploadZone.addEventListener('click', () => compFileInput.click());
+    compFileInput.addEventListener('change', e => e.target.files[0] && handleCompressorFile(e.target.files[0]));
+    compUploadZone.addEventListener('dragover', e => { e.preventDefault(); compUploadZone.classList.add('drag-over'); });
+    compUploadZone.addEventListener('dragleave', () => compUploadZone.classList.remove('drag-over'));
+    compUploadZone.addEventListener('drop', e => {
         e.preventDefault();
-        uploadZone.classList.add('drag-over');
+        compUploadZone.classList.remove('drag-over');
+        e.dataTransfer.files[0] && handleCompressorFile(e.dataTransfer.files[0]);
     });
-    
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('drag-over');
-    });
-    
-    uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('video/')) {
-            handleFile(file);
-            const dt = new DataTransfer();
-            dt.items.add(file);
-            fileInput.files = dt.files;
-        } else {
-            setStatus('❌ Please drop a valid video file.', 'error');
-        }
-    });
-    
     compressBtn.addEventListener('click', compressVideo);
-    downloadBtn.addEventListener('click', downloadVideo);
-    clearBtn.addEventListener('click', clearAll);
+    downloadCompressBtn.addEventListener('click', downloadCompressed);
+    clearCompressBtn.addEventListener('click', clearCompressor);
+
+    // ============================================
+    // VIDEO FORMAT CONVERTER
+    // ============================================
+    let converterFile = null, converterUrl = null, convertedBlob = null, isConverting = false;
     
-    setStatus('📌 Ready — No cache, no site data, NO VIDEO PLAYBACK during compression. Your privacy is fully protected.', 'info');
-    console.log('Video Compressor - Complete Privacy Mode: No playback, no storage, no preview');
+    const convUploadZone = document.getElementById('converterUploadZone');
+    const convFileInput = document.getElementById('converterFileInput');
+    const convFileName = document.getElementById('converterFileName');
+    const convFileInfo = document.getElementById('converterFileInfo');
+    const convertBtn = document.getElementById('convertBtn');
+    const downloadConvertBtn = document.getElementById('downloadConvertBtn');
+    const clearConvertBtn = document.getElementById('clearConvertBtn');
+    const convertStatus = document.getElementById('convertStatus');
+    const convertProgress = document.getElementById('convertProgress');
+    const convertProgressFill = document.getElementById('convertProgressFill');
+    const convertProgressText = document.getElementById('convertProgressText');
+    const convertFrom = document.getElementById('convertFrom');
+    const convertTo = document.getElementById('convertTo');
+    const convertQuality = document.getElementById('convertQuality');
+
+    function setConvertStatus(msg, isError = false, isSuccess = false) {
+        convertStatus.textContent = msg;
+        convertStatus.className = 'status-area';
+        if (isSuccess) convertStatus.classList.add('status-success');
+        if (isError) convertStatus.classList.add('status-error');
+    }
+
+    function updateConvertProgress(percent, text) {
+        convertProgress.style.display = 'block';
+        convertProgressFill.style.width = `${Math.min(100, percent)}%`;
+        convertProgressText.textContent = text || `${Math.round(percent)}%`;
+        if (percent >= 100) setTimeout(() => convertProgress.style.display = 'none', 2000);
+    }
+
+    function handleConverterFile(file) {
+        if (!file || !file.type.startsWith('video/')) {
+            setConvertStatus('❌ Please select a valid video file', true);
+            return;
+        }
+        if (converterUrl) URL.revokeObjectURL(converterUrl);
+        converterFile = file;
+        converterUrl = URL.createObjectURL(file);
+        convFileName.innerHTML = `🔄 ${file.name}`;
+        const ext = file.name.split('.').pop().toUpperCase();
+        convertFrom.value = `From: ${ext}`;
+        convFileInfo.innerHTML = `📊 Size: ${formatFileSize(file.size)} | Source: ${ext}`;
+        setConvertStatus(`✅ Loaded: ${file.name}. Select target format and convert.`);
+        convertBtn.disabled = false;
+        downloadConvertBtn.disabled = true;
+        convertedBlob = null;
+    }
+
+    async function convertVideo() {
+        if (!converterFile) { setConvertStatus('⚠️ Upload a video first', true); return; }
+        if (isConverting) return;
+        isConverting = true;
+        convertBtn.disabled = true;
+        downloadConvertBtn.disabled = true;
+        
+        const targetFormat = convertTo.value;
+        const quality = convertQuality.value;
+        let bitrate = quality === 'high' ? 2000000 : (quality === 'medium' ? 1000000 : 500000);
+        
+        updateConvertProgress(5, 'Loading video for conversion...');
+        setConvertStatus('🔄 Converting format...');
+        
+        try {
+            const video = document.createElement('video');
+            video.src = converterUrl;
+            video.muted = true;
+            video.style.display = 'none';
+            document.body.appendChild(video);
+            
+            await new Promise((resolve, reject) => {
+                video.onloadedmetadata = resolve;
+                video.onerror = reject;
+                video.load();
+            });
+            
+            const width = video.videoWidth;
+            const height = video.videoHeight;
+            const duration = video.duration;
+            const fps = 30;
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            const stream = canvas.captureStream(fps);
+            
+            let mimeType = targetFormat === 'mp4' ? 'video/mp4' : (targetFormat === 'webm' ? 'video/webm' : 'video/quicktime');
+            const mimeTypes = [mimeType, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
+            let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || mimeTypes[0];
+            
+            const recorder = new MediaRecorder(stream, { mimeType: selectedMime, videoBitsPerSecond: bitrate });
+            const chunks = [];
+            recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+            recorder.start(100);
+            
+            const totalFrames = Math.ceil(duration * fps);
+            for (let frame = 0; frame < totalFrames; frame++) {
+                const time = frame / fps;
+                if (time > duration) break;
+                video.currentTime = time;
+                await new Promise(r => { video.onseeked = r; if (video.currentTime === time) r(); });
+                ctx.drawImage(video, 0, 0, width, height);
+                updateConvertProgress(20 + (frame / totalFrames) * 75, `Converting frame ${frame+1}/${totalFrames}`);
+                if (frame % 15 === 0) await sleep(5);
+            }
+            
+            recorder.stop();
+            await new Promise(r => recorder.onstop = r);
+            
+            convertedBlob = new Blob(chunks, { type: selectedMime });
+            video.remove();
+            
+            updateConvertProgress(100, `Converted! ${formatFileSize(converterFile.size)} → ${formatFileSize(convertedBlob.size)}`);
+            setConvertStatus(`✅ Converted to ${targetFormat.toUpperCase()}. Download ready.`, false, true);
+            downloadConvertBtn.disabled = false;
+        } catch (err) {
+            setConvertStatus(`❌ Conversion error: ${err.message}`, true);
+        } finally {
+            isConverting = false;
+            if (converterFile) convertBtn.disabled = false;
+        }
+    }
+
+    function downloadConverted() {
+        if (!convertedBlob) return;
+        const format = convertTo.value;
+        const url = URL.createObjectURL(convertedBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${converterFile.name.replace(/\.[^/.]+$/, '')}_converted.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+        setConvertStatus('📥 Download started');
+    }
+
+    function clearConverter() {
+        if (converterUrl) URL.revokeObjectURL(converterUrl);
+        converterFile = null;
+        convertedBlob = null;
+        convFileName.innerHTML = 'Click or drag video file here';
+        convFileInfo.innerHTML = '';
+        convertFrom.value = 'Auto-detected';
+        convertBtn.disabled = true;
+        downloadConvertBtn.disabled = true;
+        setConvertStatus('🧹 Cleared. Upload a new video.');
+        convertProgress.style.display = 'none';
+        convFileInput.value = '';
+    }
+
+    convUploadZone.addEventListener('click', () => convFileInput.click());
+    convFileInput.addEventListener('change', e => e.target.files[0] && handleConverterFile(e.target.files[0]));
+    convUploadZone.addEventListener('dragover', e => { e.preventDefault(); convUploadZone.classList.add('drag-over'); });
+    convUploadZone.addEventListener('dragleave', () => convUploadZone.classList.remove('drag-over'));
+    convUploadZone.addEventListener('drop', e => {
+        e.preventDefault();
+        convUploadZone.classList.remove('drag-over');
+        e.dataTransfer.files[0] && handleConverterFile(e.dataTransfer.files[0]);
+    });
+    convertBtn.addEventListener('click', convertVideo);
+    downloadConvertBtn.addEventListener('click', downloadConverted);
+    clearConvertBtn.addEventListener('click', clearConverter);
+
+    setCompressStatus('📌 Ready — Upload a video to compress silently');
+    setConvertStatus('📌 Ready — Upload a video to convert format');
 </script>
 </body>
 </html>
