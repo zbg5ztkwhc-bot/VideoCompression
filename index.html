@@ -537,54 +537,72 @@
 
 <script>
     // Cache Prevention
-    Storage.prototype.getItem = function() { return null; };
-    Storage.prototype.setItem = function() { return; };
-    Storage.prototype.removeItem = function() { return; };
-    sessionStorage.getItem = function() { return null; };
-    sessionStorage.setItem = function() { return; };
-    if (window.indexedDB) window.indexedDB.open = function() { return null; };
-    if (window.caches) window.caches.open = async () => { throw new Error('Cache disabled'); };
-    try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
+    (function() {
+        Storage.prototype.getItem = function() { return null; };
+        Storage.prototype.setItem = function() { return; };
+        Storage.prototype.removeItem = function() { return; };
+        Storage.prototype.clear = function() { return; };
+        
+        if (window.sessionStorage) {
+            sessionStorage.getItem = function() { return null; };
+            sessionStorage.setItem = function() { return; };
+            sessionStorage.removeItem = function() { return; };
+            sessionStorage.clear = function() { return; };
+        }
+        
+        if (window.indexedDB) {
+            window.indexedDB.open = function() { return null; };
+            window.indexedDB.deleteDatabase = function() { return; };
+        }
+        
+        if (window.caches) {
+            window.caches.open = async function() { throw new Error('Cache disabled'); };
+            window.caches.keys = async function() { return []; };
+        }
+        
+        try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
+    })();
 
-    // Page Navigation
+    // Page Navigation - FIXED
     function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
-        document.getElementById(`${pageId}-page`).classList.add('active-page');
+        console.log('Switching to page:', pageId);
+        const compressorPage = document.getElementById('compressor-page');
+        const converterPage = document.getElementById('converter-page');
+        
+        if (pageId === 'compressor') {
+            compressorPage.classList.add('active-page');
+            converterPage.classList.remove('active-page');
+        } else if (pageId === 'converter') {
+            converterPage.classList.add('active-page');
+            compressorPage.classList.remove('active-page');
+        }
+        
+        // Update active button state
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
-            if (btn.dataset.page === pageId) btn.classList.add('active');
+            if (btn.dataset.page === pageId) {
+                btn.classList.add('active');
+            }
         });
     }
+    
     document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', () => switchPage(btn.dataset.page));
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const pageId = btn.dataset.page;
+            switchPage(pageId);
+        });
     });
 
     // Helper Functions
     function formatFileSize(bytes) {
-        if (!bytes) return 'Unknown';
+        if (!bytes || bytes === 0) return 'Unknown';
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(1024));
         return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-    function getMimeType(format) {
-        const mimeMap = {
-            mp4: 'video/mp4',
-            webm: 'video/webm',
-            mov: 'video/quicktime',
-            avi: 'video/x-msvideo',
-            mkv: 'video/x-matroska',
-            flv: 'video/x-flv',
-            wmv: 'video/x-ms-wmv',
-            '3gp': 'video/3gpp',
-            ogv: 'video/ogg',
-            m4v: 'video/x-m4v',
-            mpeg: 'video/mpeg'
-        };
-        return mimeMap[format] || 'video/mp4';
-    }
 
     function getBitrate(quality) {
         switch(quality) {
@@ -760,7 +778,7 @@
     clearCompressBtn.addEventListener('click', clearCompressor);
 
     // ============================================
-    // VIDEO FORMAT CONVERTER - FULLY FUNCTIONAL FIXED
+    // VIDEO FORMAT CONVERTER - FULLY WORKING
     // ============================================
     let converterFile = null, converterUrl = null, convertedBlob = null, isConverting = false;
     
@@ -861,9 +879,7 @@
             const ctx = canvas.getContext('2d');
             const stream = canvas.captureStream(fps);
             
-            const targetMime = getMimeType(targetFormat);
-            const mimeTypes = [targetMime, 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
-            let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || 'video/mp4';
-            
-            const options = { mimeType: selectedMime, videoBitsPerSecond: bitrate };
-            const
+            // Get MIME type for target format
+            const mimeMap = {
+                mp4: 'video/mp4', webm: 'video/webm', mov: 'video/quicktime',
+                avi: 'video/x-msvideo', mkv: 'video/x-matroska', flv: 'video/x-flv
