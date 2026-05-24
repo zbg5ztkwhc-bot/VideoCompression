@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · All Formats · FFmpeg Powered</title>
-    <!-- FFmpeg.wasm for video compression -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
+    <title>Video Compressor · All Formats · Working FFmpeg</title>
+    <!-- FFmpeg.wasm v0.12.6 correct CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.6/dist/ffmpeg.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -30,7 +30,6 @@
             border-radius: 32px;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            backdrop-filter: blur(2px);
         }
 
         .header {
@@ -43,7 +42,6 @@
         .header h1 {
             font-size: 2rem;
             margin-bottom: 8px;
-            letter-spacing: -0.5px;
         }
 
         .header p {
@@ -78,7 +76,6 @@
         .upload-area:hover {
             background: #f0f2ff;
             border-color: #667eea;
-            transform: scale(0.99);
         }
 
         .upload-icon {
@@ -103,7 +100,6 @@
             color: #1e40af;
         }
 
-        /* Settings Grid */
         .settings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -125,7 +121,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 0.95rem;
         }
 
         select, input {
@@ -137,7 +132,6 @@
             font-size: 0.9rem;
             cursor: pointer;
             outline: none;
-            transition: all 0.2s;
         }
 
         select:focus, input:focus {
@@ -155,7 +149,6 @@
 
         input[type="range"] {
             padding: 0;
-            cursor: pointer;
         }
 
         .action-buttons {
@@ -183,11 +176,6 @@
 
         button.secondary {
             background: #475569;
-            box-shadow: none;
-        }
-
-        button.danger {
-            background: #ef4444;
         }
 
         button:disabled {
@@ -271,44 +259,42 @@
         <div class="header">
             <h1>🎬 Universal Video Compressor</h1>
             <p>MP4 · MOV · AVI · MKV · WebM · All formats supported</p>
-            <div class="badge">⚡ FFmpeg powered · 100% local · No upload</div>
+            <div class="badge">⚡ FFmpeg.wasm · 100% local · No upload</div>
         </div>
         <div class="content">
-            <!-- Upload Zone -->
             <div class="upload-area" id="uploadZone">
                 <div class="upload-icon">🎥📁</div>
-                <div class="file-name" id="fileNameDisplay">Click or drag any video file (MP4, MOV, AVI, MKV, WebM, etc.)</div>
+                <div class="file-name" id="fileNameDisplay">Click or drag any video file</div>
                 <input type="file" id="fileInput" accept="video/*">
-                <div class="format-badge">🔒 Supports all major formats · Local compression</div>
+                <div class="format-badge">🔒 Supports MP4, AVI, MOV, MKV, WebM, FLV, WMV & more</div>
             </div>
 
-            <!-- Compression Settings -->
             <div class="settings-grid">
                 <div class="setting-card">
                     <div class="setting-label">🎯 Compression Quality</div>
                     <select id="qualityPreset">
-                        <option value="ultra">🚀 Ultra Compression (smallest file, lower quality)</option>
-                        <option value="high" selected>⚡ High Compression (balanced, good quality)</option>
-                        <option value="medium">📀 Medium Compression (moderate size reduction)</option>
-                        <option value="light">✨ Light Compression (minimal quality loss)</option>
-                        <option value="custom">🎛️ Custom (advanced)</option>
+                        <option value="ultra">🚀 Ultra (smallest file, lower quality)</option>
+                        <option value="high" selected>⚡ High Compression (balanced)</option>
+                        <option value="medium">📀 Medium Compression</option>
+                        <option value="light">✨ Light Compression (minimal loss)</option>
+                        <option value="custom">🎛️ Custom CRF</option>
                     </select>
                 </div>
 
                 <div class="setting-card" id="customSettings" style="display: none;">
-                    <div class="setting-label">🔧 Custom CRF (Quality)</div>
+                    <div class="setting-label">🔧 CRF Value (lower = better quality)</div>
                     <input type="range" id="crfSlider" min="18" max="51" step="1" value="28">
                     <div class="range-value">
-                        <span>Better Quality (18)</span>
+                        <span>Best Quality (18)</span>
                         <span id="crfValue">28</span>
-                        <span>Smaller Size (51)</span>
+                        <span>Smallest (51)</span>
                     </div>
                     <div class="setting-label" style="margin-top: 12px;">📐 Resolution Scale</div>
                     <select id="resolutionScale">
-                        <option value="1">100% (original size)</option>
+                        <option value="1">100% (original)</option>
                         <option value="0.75" selected>75% (recommended)</option>
-                        <option value="0.5">50% (half resolution)</option>
-                        <option value="0.35">35% (small video)</option>
+                        <option value="0.5">50% (half)</option>
+                        <option value="0.35">35% (small)</option>
                     </select>
                 </div>
 
@@ -317,52 +303,50 @@
                     <select id="outputFormat">
                         <option value="mp4">MP4 (best compatibility)</option>
                         <option value="webm">WebM (smaller size)</option>
-                        <option value="mov">MOV (Apple compatible)</option>
                     </select>
                 </div>
 
                 <div class="setting-card">
-                    <div class="setting-label">⚙️ Advanced Options</div>
-                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 10px;">
-                        <input type="checkbox" id="removeAudio"> 🔇 Remove audio track
-                    </label>
+                    <div class="setting-label">⚙️ Options</div>
                     <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                        <input type="checkbox" id="fastCompress"> ⚡ Fast compression (lower efficiency)
+                        <input type="checkbox" id="removeAudio"> 🔇 Remove audio
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px;">
+                        <input type="checkbox" id="fastCompress"> ⚡ Fast compression
                     </label>
                 </div>
             </div>
 
             <div class="action-buttons">
                 <button id="compressBtn" disabled>🎬 Compress Video</button>
-                <button id="downloadBtn" disabled>💾 Download Compressed</button>
-                <button id="clearBtn" class="secondary">🗑️ Clear All</button>
+                <button id="downloadBtn" disabled>💾 Download</button>
+                <button id="clearBtn" class="secondary">🗑️ Clear</button>
             </div>
 
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-text" id="progressText">Loading FFmpeg...</div>
+                <div class="progress-text" id="progressText">Initializing...</div>
             </div>
 
             <div class="status-area" id="statusMsg">
-                📌 Ready — Upload any video file, choose compression settings, and compress locally.
+                📌 Loading FFmpeg engine (first time ~25MB)... Please wait.
             </div>
             <div class="info-note">
-                💡 Supports MP4, AVI, MOV, MKV, WebM, FLV, WMV, and more. Compression happens entirely in your browser using FFmpeg.wasm.
+                💡 Note: First compression requires downloading FFmpeg (~25MB). After that, it works offline.
             </div>
         </div>
-        <footer>🔒 100% local processing · Your video never leaves your device · No data upload</footer>
+        <footer>🔒 100% local processing · Your video never leaves your device</footer>
     </div>
 </div>
 
 <script>
-    // FFmpeg loading and state
     let ffmpeg = null;
     let ffmpegLoaded = false;
+    let originalFileData = null;
     let originalFile = null;
     let originalFileName = "";
-    let originalFileData = null;
     let compressedBlob = null;
     let isCompressing = false;
 
@@ -386,58 +370,8 @@
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
 
-    // Show/hide custom settings
-    qualityPreset.addEventListener('change', () => {
-        customSettings.style.display = qualityPreset.value === 'custom' ? 'block' : 'none';
-    });
-
-    crfSlider.addEventListener('input', () => {
-        crfValue.textContent = crfSlider.value;
-    });
-
-    // Get compression parameters based on selection
-    function getCompressionParams() {
-        let crf;
-        let preset;
-        let scale = parseFloat(resolutionScale.value);
-        
-        if (qualityPreset.value === 'custom') {
-            crf = parseInt(crfSlider.value);
-            preset = fastCompress.checked ? 'veryfast' : 'medium';
-        } else {
-            switch(qualityPreset.value) {
-                case 'ultra':
-                    crf = 45;
-                    preset = 'veryfast';
-                    break;
-                case 'high':
-                    crf = 32;
-                    preset = 'medium';
-                    break;
-                case 'medium':
-                    crf = 28;
-                    preset = 'medium';
-                    break;
-                case 'light':
-                    crf = 23;
-                    preset = 'slow';
-                    break;
-                default:
-                    crf = 28;
-                    preset = 'medium';
-            }
-        }
-        
-        if (fastCompress.checked && qualityPreset.value !== 'custom') {
-            preset = 'veryfast';
-        }
-        
-        return { crf, preset, scale };
-    }
-
-    // Update status message
-    function setStatus(message, isError = false, isSuccess = false) {
-        statusDiv.textContent = message;
+    function setStatus(msg, isError = false, isSuccess = false) {
+        statusDiv.textContent = msg;
         statusDiv.classList.remove('status-success', 'status-error');
         if (isSuccess) statusDiv.classList.add('status-success');
         else if (isError) statusDiv.classList.add('status-error');
@@ -447,43 +381,80 @@
         if (progressContainer.style.display === 'none') progressContainer.style.display = 'block';
         progressFill.style.width = `${Math.min(100, percent)}%`;
         progressText.textContent = text || `${Math.round(percent)}%`;
-    }
-
-    function hideProgress() {
-        setTimeout(() => {
-            if (!isCompressing) {
-                progressContainer.style.display = 'none';
-            }
-        }, 1000);
-    }
-
-    // Load FFmpeg
-    async function loadFFmpeg() {
-        if (ffmpegLoaded) return true;
-        updateProgress(0, '📦 Loading FFmpeg engine (first time takes a few seconds)...');
-        setStatus('⏳ Loading FFmpeg.wasm (around 25MB) - please wait...');
-        
-        try {
-            ffmpeg = new FFmpeg();
-            await ffmpeg.load();
-            ffmpegLoaded = true;
-            updateProgress(100, '✅ FFmpeg ready!');
+        if (percent >= 100) {
             setTimeout(() => {
                 if (!isCompressing) progressContainer.style.display = 'none';
             }, 1500);
-            setStatus('✅ FFmpeg loaded! Upload a video to compress.');
+        }
+    }
+
+    qualityPreset.addEventListener('change', () => {
+        customSettings.style.display = qualityPreset.value === 'custom' ? 'block' : 'none';
+    });
+
+    crfSlider.addEventListener('input', () => {
+        crfValue.textContent = crfSlider.value;
+    });
+
+    function getCompressionParams() {
+        let crf, preset, scale = parseFloat(resolutionScale.value);
+        
+        if (qualityPreset.value === 'custom') {
+            crf = parseInt(crfSlider.value);
+            preset = fastCompress.checked ? 'veryfast' : 'medium';
+        } else {
+            switch(qualityPreset.value) {
+                case 'ultra': crf = 45; preset = 'veryfast'; break;
+                case 'high': crf = 32; preset = 'medium'; break;
+                case 'medium': crf = 28; preset = 'medium'; break;
+                case 'light': crf = 23; preset = 'slow'; break;
+                default: crf = 28; preset = 'medium';
+            }
+            if (fastCompress.checked) preset = 'veryfast';
+        }
+        return { crf, preset, scale };
+    }
+
+    // Load FFmpeg correctly
+    async function loadFFmpeg() {
+        if (ffmpegLoaded) return true;
+        
+        updateProgress(5, '📦 Loading FFmpeg core (25MB)...');
+        setStatus('⏳ Loading FFmpeg.wasm (first time downloads ~25MB)... Please wait.');
+        
+        try {
+            const { FFmpeg } = window.FFmpeg;
+            ffmpeg = new FFmpeg();
+            
+            // Set up progress logging
+            ffmpeg.on('log', ({ message }) => {
+                console.log('[FFmpeg]', message);
+            });
+            
+            ffmpeg.on('progress', ({ progress, time }) => {
+                const percent = Math.round(progress * 100);
+                updateProgress(20 + percent * 0.6, `🎬 Encoding: ${percent}%`);
+            });
+            
+            await ffmpeg.load();
+            ffmpegLoaded = true;
+            updateProgress(100, '✅ FFmpeg ready!');
+            setStatus('✅ FFmpeg loaded successfully! Upload a video to compress.', false, true);
+            setTimeout(() => {
+                if (!isCompressing) progressContainer.style.display = 'none';
+            }, 1500);
             return true;
         } catch (err) {
-            console.error(err);
-            setStatus('❌ Failed to load FFmpeg. Check internet connection and retry.', true);
+            console.error('FFmpeg load error:', err);
+            setStatus('❌ Failed to load FFmpeg. Check your internet connection and refresh the page.', true);
+            progressContainer.style.display = 'none';
             return false;
         }
     }
 
-    // Handle file upload
     async function handleFile(file) {
         if (!file || !file.type.startsWith('video/')) {
-            setStatus('❌ Please select a valid video file (MP4, MOV, AVI, MKV, WebM, etc.)', true);
+            setStatus('❌ Please select a valid video file', true);
             return;
         }
         
@@ -495,26 +466,28 @@
         originalFileName = file.name.replace(/\.[^/.]+$/, '');
         originalFileData = new Uint8Array(await file.arrayBuffer());
         
-        // Ensure FFmpeg is loaded
-        const loaded = await loadFFmpeg();
-        if (loaded) {
+        // Enable compress button if FFmpeg is loaded
+        if (ffmpegLoaded) {
             compressBtn.disabled = false;
-            downloadBtn.disabled = true;
-            compressedBlob = null;
+        } else {
+            // Try loading FFmpeg if not loaded
+            const loaded = await loadFFmpeg();
+            compressBtn.disabled = !loaded;
         }
+        downloadBtn.disabled = true;
+        compressedBlob = null;
     }
 
-    // Main compression function
     async function compressVideo() {
-        if (!originalFileData || !ffmpegLoaded) {
-            if (!ffmpegLoaded) {
-                const loaded = await loadFFmpeg();
-                if (!loaded) return;
-            }
-            if (!originalFileData) {
-                setStatus('⚠️ No video loaded. Please upload a video first.', true);
-                return;
-            }
+        if (!originalFileData) {
+            setStatus('⚠️ No video loaded. Please upload a video first.', true);
+            return;
+        }
+        
+        if (!ffmpegLoaded) {
+            setStatus('⏳ FFmpeg still loading. Please wait a moment...', true);
+            const loaded = await loadFFmpeg();
+            if (!loaded) return;
         }
         
         if (isCompressing) {
@@ -528,21 +501,21 @@
         
         const params = getCompressionParams();
         const outputExt = outputFormat.value;
-        const outputFileName = `compressed_${Date.now()}.${outputExt}`;
+        const outputFileName = `output_${Date.now()}.${outputExt}`;
+        const inputExt = originalFile.name.split('.').pop() || 'mp4';
+        const inputFileName = `input.${inputExt}`;
         
-        updateProgress(5, `🎬 Starting compression (CRF: ${params.crf}, Preset: ${params.preset})...`);
-        setStatus(`🔄 Compressing video with ${qualityPreset.options[qualityPreset.selectedIndex]?.text || 'custom'} settings...`);
+        updateProgress(5, `🎬 Starting compression (CRF: ${params.crf})...`);
+        setStatus(`🔄 Compressing with ${qualityPreset.options[qualityPreset.selectedIndex]?.text || 'custom'} settings...`);
         
         try {
-            // Write input file to FFmpeg virtual filesystem
-            const inputExt = originalFile.name.split('.').pop();
-            const inputFileName = `input.${inputExt}`;
-            ffmpeg.FS('writeFile', inputFileName, originalFileData);
+            // Write input file
+            await ffmpeg.writeFile(inputFileName, originalFileData);
             
-            // Build FFmpeg command
+            // Build command
             let args = ['-i', inputFileName];
             
-            // Add resolution scaling if needed
+            // Add scaling if needed
             if (params.scale < 0.99) {
                 args.push('-vf', `scale=iw*${params.scale}:ih*${params.scale}`);
             }
@@ -560,46 +533,40 @@
                 args.push('-b:a', '128k');
             }
             
-            // Output format specific options
+            // MP4 optimization
             if (outputExt === 'mp4') {
                 args.push('-movflags', '+faststart');
-            } else if (outputExt === 'webm') {
-                args.push('-c:v', 'libvpx-vp9');
-                args.push('-crf', (parseInt(params.crf) + 5).toString());
-                args.push('-b:v', '0');
             }
             
             args.push('-y', outputFileName);
             
-            updateProgress(15, `🎞️ Running FFmpeg command...`);
+            updateProgress(15, '🎞️ Running FFmpeg...');
             
-            // Run FFmpeg with progress
+            // Execute compression
             await ffmpeg.exec(args);
             
-            updateProgress(85, `📦 Reading compressed file...`);
+            updateProgress(85, '📦 Reading compressed file...');
             
-            // Read output file
-            const outputData = ffmpeg.FS('readFile', outputFileName);
+            // Read output
+            const outputData = await ffmpeg.readFile(outputFileName);
             compressedBlob = new Blob([outputData.buffer], { type: `video/${outputExt}` });
             
-            // Cleanup virtual files
-            ffmpeg.FS('unlink', inputFileName);
-            ffmpeg.FS('unlink', outputFileName);
+            // Cleanup
+            await ffmpeg.deleteFile(inputFileName);
+            await ffmpeg.deleteFile(outputFileName);
             
-            const originalSizeMB = (originalFileData.length / (1024 * 1024)).toFixed(2);
-            const newSizeMB = (compressedBlob.size / (1024 * 1024)).toFixed(2);
-            const savedPercent = ((1 - compressedBlob.size / originalFileData.length) * 100).toFixed(1);
+            const originalMB = (originalFileData.length / (1024 * 1024)).toFixed(2);
+            const newMB = (compressedBlob.size / (1024 * 1024)).toFixed(2);
+            const saved = ((1 - compressedBlob.size / originalFileData.length) * 100).toFixed(1);
             
-            updateProgress(100, `✅ Complete! ${originalSizeMB}MB → ${newSizeMB}MB (${savedPercent}% saved)`);
-            setStatus(`✅ Success! Size reduced from ${originalSizeMB}MB to ${newSizeMB}MB (${savedPercent}% smaller). Download your compressed video.`, false, true);
+            updateProgress(100, `✅ Complete! ${originalMB}MB → ${newMB}MB (${saved}% saved)`);
+            setStatus(`✅ Success! ${originalMB}MB → ${newMB}MB (${saved}% smaller). Download your compressed video.`, false, true);
             
             downloadBtn.disabled = false;
-            setTimeout(() => hideProgress(), 2000);
             
         } catch (err) {
             console.error('Compression error:', err);
             setStatus(`❌ Compression failed: ${err.message || 'Unknown error'}`, true);
-            hideProgress();
             compressedBlob = null;
         } finally {
             isCompressing = false;
@@ -609,47 +576,31 @@
         }
     }
 
-    // Download compressed video
     function downloadVideo() {
         if (!compressedBlob) {
             setStatus('No compressed video. Please compress first.', true);
             return;
         }
-        
         const ext = outputFormat.value;
-        const downloadName = `${originalFileName}_compressed.${ext}`;
         const url = URL.createObjectURL(compressedBlob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = downloadName;
-        document.body.appendChild(a);
+        a.download = `${originalFileName}_compressed.${ext}`;
         a.click();
-        document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        setStatus(`📥 Download started: ${downloadName}`);
+        setStatus(`📥 Download started`);
     }
 
-    // Clear everything
     function clearAll() {
-        originalFile = null;
-        originalFileName = "";
         originalFileData = null;
+        originalFile = null;
         compressedBlob = null;
         isCompressing = false;
         compressBtn.disabled = true;
         downloadBtn.disabled = true;
-        fileNameDisplay.textContent = "Click or drag any video file (MP4, MOV, AVI, MKV, WebM, etc.)";
-        setStatus("🧹 Cleared. Upload a new video to compress.");
-        hideProgress();
-        if (ffmpeg && ffmpegLoaded) {
-            // Clean FFmpeg filesystem if needed
-            try {
-                const files = ffmpeg.FS('readdir', '/');
-                files.forEach(f => {
-                    if (f !== '.' && f !== '..') ffmpeg.FS('unlink', f);
-                });
-            } catch(e) {}
-        }
+        fileNameDisplay.textContent = "Click or drag any video file";
+        setStatus("🧹 Cleared. Upload a new video.");
+        progressContainer.style.display = 'none';
     }
 
     // Event listeners
@@ -677,14 +628,8 @@
     downloadBtn.addEventListener('click', downloadVideo);
     clearBtn.addEventListener('click', clearAll);
     
-    // Preload FFmpeg on page load for better UX
-    setTimeout(() => {
-        if (!ffmpegLoaded) {
-            loadFFmpeg().catch(console.warn);
-        }
-    }, 1000);
-    
-    setStatus('📌 Ready — Upload any video (MP4, MOV, AVI, MKV, WebM, etc.) to begin compression.');
+    // Auto-load FFmpeg on page load
+    loadFFmpeg();
 </script>
 </body>
 </html>
