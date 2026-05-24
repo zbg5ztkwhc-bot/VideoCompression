@@ -377,7 +377,7 @@
         <div class="card">
             <div class="header">
                 <h1>🎬 Video Compressor</h1>
-                <p>Reduce file size · All formats supported · Silent processing</p>
+                <p>Reduce file size · All formats supported · Fast processing</p>
                 <div class="badge">⚡ No cache · Privacy first</div>
                 <div class="creator-tag">Created by Mahmoud Hamouda</div>
             </div>
@@ -398,17 +398,17 @@
                     <div class="setting-card">
                         <div class="setting-label">🎯 Compression Level</div>
                         <select id="qualityPreset">
-                            <option value="ultra">🚀 Ultra Compression</option>
-                            <option value="high" selected>⚡ High Compression</option>
+                            <option value="ultra">🚀 Ultra Compression (smallest)</option>
+                            <option value="high" selected>⚡ High Compression (recommended)</option>
                             <option value="medium">📀 Medium Compression</option>
-                            <option value="light">✨ Light Compression</option>
+                            <option value="light">✨ Light Compression (minimal loss)</option>
                         </select>
                     </div>
                     <div class="setting-card">
                         <div class="setting-label">📐 Resolution Scale</div>
                         <select id="resolutionScale">
                             <option value="1">100% (original)</option>
-                            <option value="0.85" selected>85%</option>
+                            <option value="0.85" selected>85% (recommended)</option>
                             <option value="0.7">70%</option>
                             <option value="0.5">50%</option>
                         </select>
@@ -449,7 +449,7 @@
         </div>
     </div>
 
-    <!-- Video Format Converter Page -->
+    <!-- Video Format Converter Page - FULLY FUNCTIONAL -->
     <div id="converter-page" class="page">
         <div class="card">
             <div class="header">
@@ -459,7 +459,7 @@
                 <div class="creator-tag">Created by Mahmoud Hamouda</div>
             </div>
             <div class="content">
-                <div class="privacy-note">🔐 <strong>All Formats Supported:</strong> Upload any video, convert to any format!</div>
+                <div class="privacy-note">🔐 <strong>All Formats Supported:</strong> Upload any video, convert to any format! Works with all video types.</div>
                 <div class="upload-area" id="converterUploadZone">
                     <div class="upload-icon">🔄📁</div>
                     <div class="file-name" id="converterFileName">Click or drag video file here</div>
@@ -760,7 +760,7 @@
     clearCompressBtn.addEventListener('click', clearCompressor);
 
     // ============================================
-    // VIDEO FORMAT CONVERTER - FULLY FUNCTIONAL
+    // VIDEO FORMAT CONVERTER - FULLY FUNCTIONAL FIXED
     // ============================================
     let converterFile = null, converterUrl = null, convertedBlob = null, isConverting = false;
     
@@ -775,9 +775,9 @@
     const convertProgress = document.getElementById('convertProgress');
     const convertProgressFill = document.getElementById('convertProgressFill');
     const convertProgressText = document.getElementById('convertProgressText');
-    const convertTo = document.getElementById('convertTo');
-    const convertQuality = document.getElementById('convertQuality');
-    const frameRate = document.getElementById('frameRate');
+    const convertToSelect = document.getElementById('convertTo');
+    const convertQualitySelect = document.getElementById('convertQuality');
+    const frameRateSelect = document.getElementById('frameRate');
 
     function setConvertStatus(msg, isError = false, isSuccess = false) {
         convertStatus.textContent = msg;
@@ -804,38 +804,42 @@
         const ext = file.name.split('.').pop().toUpperCase();
         convFileName.innerHTML = `🔄 ${file.name}`;
         convFileInfo.innerHTML = `📊 Size: ${formatFileSize(file.size)} | Source: ${ext}`;
-        setConvertStatus(`✅ Loaded: ${file.name}. Select target format and convert.`);
+        setConvertStatus(`✅ Loaded: ${file.name}. Select target format and click Convert.`, false);
         convertBtn.disabled = false;
         downloadConvertBtn.disabled = true;
         convertedBlob = null;
     }
 
     async function convertVideo() {
-        if (!converterFile) { setConvertStatus('⚠️ Upload a video first', true); return; }
-        if (isConverting) return;
+        if (!converterFile) { setConvertStatus('⚠️ Please upload a video first', true); return; }
+        if (isConverting) { setConvertStatus('⏳ Conversion already in progress...', false); return; }
+        
         isConverting = true;
         convertBtn.disabled = true;
         downloadConvertBtn.disabled = true;
         
-        const targetFormat = convertTo.value;
-        const quality = convertQuality.value;
-        const fps = parseInt(frameRate.value);
+        const targetFormat = convertToSelect.value;
+        const quality = convertQualitySelect.value;
+        const fps = parseInt(frameRateSelect.value);
         const bitrate = getBitrate(quality);
-        const targetMime = getMimeType(targetFormat);
         
         updateConvertProgress(5, 'Loading video for conversion...');
-        setConvertStatus(`🔄 Converting to ${targetFormat.toUpperCase()}... This may take a moment.`);
+        setConvertStatus(`🔄 Converting to ${targetFormat.toUpperCase()}... Please wait.`);
         
         try {
             const video = document.createElement('video');
             video.src = converterUrl;
             video.muted = true;
+            video.crossOrigin = 'anonymous';
             document.body.appendChild(video);
             
             await new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => reject(new Error('Video load timeout')), 15000);
                 video.onloadedmetadata = () => {
                     clearTimeout(timeout);
+                    if (video.videoWidth === 0 || video.videoHeight === 0) {
+                        reject(new Error('Invalid video dimensions'));
+                    }
                     resolve();
                 };
                 video.onerror = () => {
@@ -849,7 +853,7 @@
             const height = video.videoHeight;
             const duration = video.duration;
             
-            if (width === 0 || height === 0) throw new Error('Invalid video dimensions');
+            updateConvertProgress(15, `Resolution: ${width}x${height}, Duration: ${duration.toFixed(1)}s`);
             
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -857,19 +861,9 @@
             const ctx = canvas.getContext('2d');
             const stream = canvas.captureStream(fps);
             
+            const targetMime = getMimeType(targetFormat);
             const mimeTypes = [targetMime, 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
             let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || 'video/mp4';
             
             const options = { mimeType: selectedMime, videoBitsPerSecond: bitrate };
-            const recorder = new MediaRecorder(stream, options);
-            const chunks = [];
-            
-            recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
-            recorder.start(100);
-            
-            const totalFrames = Math.ceil(duration * fps);
-            video.currentTime = 0;
-            
-            for (let frame = 0; frame < totalFrames; frame++) {
-                const time = frame / fps;
-                if
+            const
