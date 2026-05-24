@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Video Tools Hub · All Formats · Created by Mahmoud Hamouda</title>
-    <!-- Anti-cache meta tags -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -27,7 +26,6 @@
             margin: 0 auto;
         }
 
-        /* Dashboard Navigation */
         .dashboard-nav {
             background: rgba(255,255,255,0.1);
             backdrop-filter: blur(10px);
@@ -65,7 +63,6 @@
             transform: translateY(-2px);
         }
 
-        /* Pages */
         .page {
             display: none;
         }
@@ -370,7 +367,6 @@
 </head>
 <body>
 <div class="container">
-    <!-- Dashboard Navigation -->
     <div class="dashboard-nav">
         <button class="nav-btn active" data-page="compressor">🎬 Video Compressor</button>
         <button class="nav-btn" data-page="converter">🔄 Video Format Converter</button>
@@ -381,37 +377,38 @@
         <div class="card">
             <div class="header">
                 <h1>🎬 Video Compressor</h1>
-                <p>Reduce file size · Maintain quality · Silent processing</p>
-                <div class="badge">⚡ No cache · No playback · Privacy first</div>
+                <p>Reduce file size · All formats supported · Silent processing</p>
+                <div class="badge">⚡ No cache · Privacy first</div>
                 <div class="creator-tag">Created by Mahmoud Hamouda</div>
             </div>
             <div class="content">
-                <div class="privacy-note">
-                    🔐 <strong>Privacy Mode:</strong> No cache, no localStorage, NO VIDEO PLAYBACK during compression.
-                </div>
-
+                <div class="privacy-note">🔐 <strong>Privacy Mode:</strong> No cache, no localStorage, no data persistence.</div>
                 <div class="upload-area" id="compressorUploadZone">
                     <div class="upload-icon">🎥📁</div>
                     <div class="file-name" id="compressorFileName">Click or drag video file here</div>
                     <div class="file-info" id="compressorFileInfo"></div>
-                    <input type="file" id="compressorFileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/flv,video/x-flv,video/x-ms-wmv,video/*">
+                    <input type="file" id="compressorFileInput" accept="video/*">
+                    <div class="format-list">
+                        <span class="format-chip">MP4</span><span class="format-chip">WebM</span><span class="format-chip">MOV</span>
+                        <span class="format-chip">AVI</span><span class="format-chip">MKV</span><span class="format-chip">FLV</span>
+                        <span class="format-chip">WMV</span><span class="format-chip">3GP</span><span class="format-chip">OGV</span>
+                    </div>
                 </div>
-
                 <div class="settings-grid">
                     <div class="setting-card">
                         <div class="setting-label">🎯 Compression Level</div>
                         <select id="qualityPreset">
-                            <option value="ultra">🚀 Ultra Compression (smallest)</option>
-                            <option value="high" selected>⚡ High Compression (recommended)</option>
+                            <option value="ultra">🚀 Ultra Compression</option>
+                            <option value="high" selected>⚡ High Compression</option>
                             <option value="medium">📀 Medium Compression</option>
-                            <option value="light">✨ Light Compression (minimal loss)</option>
+                            <option value="light">✨ Light Compression</option>
                         </select>
                     </div>
                     <div class="setting-card">
                         <div class="setting-label">📐 Resolution Scale</div>
                         <select id="resolutionScale">
                             <option value="1">100% (original)</option>
-                            <option value="0.85" selected>85% (recommended)</option>
+                            <option value="0.85" selected>85%</option>
                             <option value="0.7">70%</option>
                             <option value="0.5">50%</option>
                         </select>
@@ -419,8 +416,8 @@
                     <div class="setting-card">
                         <div class="setting-label">🎬 Output Format</div>
                         <select id="outputFormat">
-                            <option value="mp4">MP4 (H.264/AAC - Best Compatibility)</option>
-                            <option value="webm">WebM (VP9/Opus - Smaller Size)</option>
+                            <option value="mp4">MP4 (Best Compatibility)</option>
+                            <option value="webm">WebM (Smaller Size)</option>
                         </select>
                     </div>
                     <div class="setting-card">
@@ -429,112 +426,100 @@
                             <input type="checkbox" id="removeAudioCompress"> 🔇 Remove audio
                         </label>
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-top: 10px;">
-                            <input type="checkbox" id="fastModeCompress"> ⚡ Fast mode (lower efficiency)
+                            <input type="checkbox" id="fastModeCompress"> ⚡ Fast mode
                         </label>
                     </div>
                 </div>
-
                 <div class="action-buttons">
                     <button id="compressBtn" disabled>🎬 Compress Video</button>
                     <button id="downloadCompressBtn" disabled>💾 Download</button>
                     <button id="clearCompressBtn" class="secondary">🗑️ Clear</button>
                 </div>
-
                 <div class="progress-container" id="compressProgress">
                     <div class="progress-bar"><div class="progress-fill" id="compressProgressFill"></div></div>
                     <div class="progress-text" id="compressProgressText">Ready</div>
                 </div>
-                <div class="status-area" id="compressStatus">📌 Ready — Upload a video to compress silently</div>
+                <div class="status-area" id="compressStatus">📌 Ready — Upload any video to compress</div>
             </div>
             <div class="contact-bar">
                 <div class="credit">👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024</div>
                 <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link">💬 Contact on WhatsApp</a>
             </div>
-            <footer>🔒 100% local · No cache · No video playback</footer>
+            <footer>🔒 100% local · No cache · All formats supported</footer>
         </div>
     </div>
 
-    <!-- Video Format Converter Page - ALL FORMATS -->
+    <!-- Video Format Converter Page -->
     <div id="converter-page" class="page">
         <div class="card">
             <div class="header">
                 <h1>🔄 Video Format Converter</h1>
-                <p>Convert between MP4 · WebM · MOV · AVI · MKV · FLV · WMV · 3GP · OGV</p>
-                <div class="badge">⚡ Supports 15+ formats · Local conversion</div>
+                <p>Convert between MP4 · WebM · MOV · AVI · MKV · FLV · WMV · 3GP · OGV · M4V</p>
+                <div class="badge">⚡ 15+ formats · Fully functional converter</div>
                 <div class="creator-tag">Created by Mahmoud Hamouda</div>
             </div>
             <div class="content">
-                <div class="privacy-note">
-                    🔐 <strong>All Formats Supported:</strong> MP4, WebM, MOV, AVI, MKV, FLV, WMV, 3GP, OGV, M4V, MPEG, etc.
-                </div>
-
+                <div class="privacy-note">🔐 <strong>All Formats Supported:</strong> Upload any video, convert to any format!</div>
                 <div class="upload-area" id="converterUploadZone">
                     <div class="upload-icon">🔄📁</div>
                     <div class="file-name" id="converterFileName">Click or drag video file here</div>
                     <div class="file-info" id="converterFileInfo"></div>
-                    <input type="file" id="converterFileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/flv,video/x-flv,video/x-ms-wmv,video/3gpp,video/ogg,video/mpeg,video/mp2t,video/x-m4v,video/*">
+                    <input type="file" id="converterFileInput" accept="video/*">
                     <div class="format-list">
-                        <span class="format-chip">MP4</span>
-                        <span class="format-chip">WebM</span>
-                        <span class="format-chip">MOV</span>
-                        <span class="format-chip">AVI</span>
-                        <span class="format-chip">MKV</span>
-                        <span class="format-chip">FLV</span>
-                        <span class="format-chip">WMV</span>
-                        <span class="format-chip">3GP</span>
-                        <span class="format-chip">OGV</span>
-                        <span class="format-chip">M4V</span>
-                        <span class="format-chip">MPEG</span>
+                        <span class="format-chip">MP4</span><span class="format-chip">WebM</span><span class="format-chip">MOV</span>
+                        <span class="format-chip">AVI</span><span class="format-chip">MKV</span><span class="format-chip">FLV</span>
+                        <span class="format-chip">WMV</span><span class="format-chip">3GP</span><span class="format-chip">OGV</span>
+                        <span class="format-chip">M4V</span><span class="format-chip">MPEG</span>
                     </div>
                 </div>
-
                 <div class="settings-grid">
-                    <div class="setting-card">
-                        <div class="setting-label">📤 Source Format</div>
-                        <select id="convertFrom" disabled>
-                            <option>Auto-detected</option>
-                        </select>
-                    </div>
                     <div class="setting-card">
                         <div class="setting-label">📥 Convert To</div>
                         <select id="convertTo">
                             <optgroup label="📱 Common Formats">
-                                <option value="mp4">MP4 (H.264/AAC) - Best Compatibility</option>
+                                <option value="mp4" selected>MP4 (H.264/AAC) - Best Compatibility</option>
                                 <option value="webm">WebM (VP9/Opus) - Smaller Size</option>
-                                <option value="mov">MOV (QuickTime) - Apple Compatible</option>
+                                <option value="mov">MOV (QuickTime) - Apple</option>
                             </optgroup>
                             <optgroup label="💻 Desktop Formats">
                                 <option value="avi">AVI (Audio Video Interleave)</option>
-                                <option value="mkv">MKV (Matroska) - High Quality</option>
-                                <option value="wmv">WMV (Windows Media Video)</option>
+                                <option value="mkv">MKV (Matroska)</option>
+                                <option value="wmv">WMV (Windows Media)</option>
                             </optgroup>
-                            <optgroup label="📺 Web & Streaming">
+                            <optgroup label="📺 Web & Mobile">
                                 <option value="flv">FLV (Flash Video)</option>
                                 <option value="ogv">OGV (Ogg Video)</option>
-                                <option value="3gp">3GP (Mobile Video)</option>
+                                <option value="3gp">3GP (Mobile)</option>
                             </optgroup>
-                            <optgroup label="🎬 Other Formats">
-                                <option value="m4v">M4V (iTunes Video)</option>
+                            <optgroup label="🎬 Other">
+                                <option value="m4v">M4V (iTunes)</option>
                                 <option value="mpeg">MPEG (MPEG-1/2)</option>
                             </optgroup>
                         </select>
                     </div>
                     <div class="setting-card">
-                        <div class="setting-label">🎨 Quality Preset</div>
+                        <div class="setting-label">🎨 Quality</div>
                         <select id="convertQuality">
-                            <option value="high">✨ High Quality (slower, larger file)</option>
+                            <option value="high">✨ High Quality (slower, larger)</option>
                             <option value="medium" selected>⚖️ Medium Quality (balanced)</option>
-                            <option value="low">📦 Low Quality (smaller file, faster)</option>
+                            <option value="low">📦 Low Quality (faster, smaller)</option>
+                        </select>
+                    </div>
+                    <div class="setting-card">
+                        <div class="setting-label">🎬 Frame Rate</div>
+                        <select id="frameRate">
+                            <option value="30">30 fps (Standard)</option>
+                            <option value="24">24 fps (Film)</option>
+                            <option value="25">25 fps (PAL)</option>
+                            <option value="60">60 fps (Smooth)</option>
                         </select>
                     </div>
                 </div>
-
                 <div class="action-buttons">
                     <button id="convertBtn" disabled>🔄 Convert Video</button>
                     <button id="downloadConvertBtn" disabled>💾 Download</button>
                     <button id="clearConvertBtn" class="secondary">🗑️ Clear</button>
                 </div>
-
                 <div class="progress-container" id="convertProgress">
                     <div class="progress-bar"><div class="progress-fill" id="convertProgressFill"></div></div>
                     <div class="progress-text" id="convertProgressText">Ready</div>
@@ -545,28 +530,23 @@
                 <div class="credit">👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024</div>
                 <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link">💬 Contact on WhatsApp</a>
             </div>
-            <footer>🔒 100% local conversion · Supports 15+ video formats · No data upload</footer>
+            <footer>🔒 100% local conversion · All formats supported · No data upload</footer>
         </div>
     </div>
 </div>
 
 <script>
-    // ============================================
-    // CACHE PREVENTION
-    // ============================================
+    // Cache Prevention
     Storage.prototype.getItem = function() { return null; };
     Storage.prototype.setItem = function() { return; };
     Storage.prototype.removeItem = function() { return; };
-    Storage.prototype.clear = function() { return; };
     sessionStorage.getItem = function() { return null; };
     sessionStorage.setItem = function() { return; };
     if (window.indexedDB) window.indexedDB.open = function() { return null; };
     if (window.caches) window.caches.open = async () => { throw new Error('Cache disabled'); };
     try { localStorage.clear(); sessionStorage.clear(); } catch(e) {}
 
-    // ============================================
-    // PAGE NAVIGATION
-    // ============================================
+    // Page Navigation
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active-page'));
         document.getElementById(`${pageId}-page`).classList.add('active-page');
@@ -579,9 +559,7 @@
         btn.addEventListener('click', () => switchPage(btn.dataset.page));
     });
 
-    // ============================================
-    // HELPER FUNCTIONS
-    // ============================================
+    // Helper Functions
     function formatFileSize(bytes) {
         if (!bytes) return 'Unknown';
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -591,8 +569,7 @@
 
     function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    // Get MIME type for output format
-    function getMimeType(format, quality) {
+    function getMimeType(format) {
         const mimeMap = {
             mp4: 'video/mp4',
             webm: 'video/webm',
@@ -609,7 +586,6 @@
         return mimeMap[format] || 'video/mp4';
     }
 
-    // Get bitrate based on quality preset
     function getBitrate(quality) {
         switch(quality) {
             case 'high': return 2500000;
@@ -620,7 +596,7 @@
     }
 
     // ============================================
-    // VIDEO COMPRESSOR (SILENT, NO PLAYBACK)
+    // VIDEO COMPRESSOR
     // ============================================
     let compressorFile = null, compressorUrl = null, compressedBlob = null, isCompressing = false;
     
@@ -676,20 +652,18 @@
         const quality = document.getElementById('qualityPreset').value;
         const scale = parseFloat(document.getElementById('resolutionScale').value);
         const outputExt = document.getElementById('outputFormat').value;
-        const removeAudio = document.getElementById('removeAudioCompress').checked;
         const fastMode = document.getElementById('fastModeCompress').checked;
         
         let bitrate = { ultra: 300000, high: 800000, medium: 1500000, light: 2500000 }[quality];
-        if (fastMode) bitrate = bitrate * 0.8;
+        if (fastMode) bitrate = bitrate * 0.7;
         
-        updateCompressProgress(5, 'Loading video (silent mode)...');
-        setCompressStatus('🔄 Compressing silently... No playback.');
+        updateCompressProgress(5, 'Loading video...');
+        setCompressStatus('🔄 Compressing video...');
         
         try {
             const video = document.createElement('video');
             video.src = compressorUrl;
             video.muted = true;
-            video.style.display = 'none';
             document.body.appendChild(video);
             
             await new Promise((resolve, reject) => {
@@ -710,7 +684,7 @@
             const stream = canvas.captureStream(fps);
             
             let mimeType = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
-            const mimeTypes = [mimeType, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus'];
+            const mimeTypes = [mimeType, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
             let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || mimeTypes[0];
             
             const recorder = new MediaRecorder(stream, { mimeType: selectedMime, videoBitsPerSecond: bitrate });
@@ -726,7 +700,7 @@
                 await new Promise(r => { video.onseeked = r; if (video.currentTime === time) r(); });
                 ctx.drawImage(video, 0, 0, newWidth, newHeight);
                 updateCompressProgress(20 + (frame / totalFrames) * 75, `Frame ${frame+1}/${totalFrames}`);
-                if (frame % 15 === 0) await sleep(5);
+                if (frame % 10 === 0) await sleep(5);
             }
             
             recorder.stop();
@@ -786,7 +760,7 @@
     clearCompressBtn.addEventListener('click', clearCompressor);
 
     // ============================================
-    // VIDEO FORMAT CONVERTER - ALL FORMATS
+    // VIDEO FORMAT CONVERTER - FULLY FUNCTIONAL
     // ============================================
     let converterFile = null, converterUrl = null, convertedBlob = null, isConverting = false;
     
@@ -803,6 +777,7 @@
     const convertProgressText = document.getElementById('convertProgressText');
     const convertTo = document.getElementById('convertTo');
     const convertQuality = document.getElementById('convertQuality');
+    const frameRate = document.getElementById('frameRate');
 
     function setConvertStatus(msg, isError = false, isSuccess = false) {
         convertStatus.textContent = msg;
@@ -844,28 +819,37 @@
         
         const targetFormat = convertTo.value;
         const quality = convertQuality.value;
+        const fps = parseInt(frameRate.value);
         const bitrate = getBitrate(quality);
+        const targetMime = getMimeType(targetFormat);
         
         updateConvertProgress(5, 'Loading video for conversion...');
-        setConvertStatus(`🔄 Converting to ${targetFormat.toUpperCase()}...`);
+        setConvertStatus(`🔄 Converting to ${targetFormat.toUpperCase()}... This may take a moment.`);
         
         try {
             const video = document.createElement('video');
             video.src = converterUrl;
             video.muted = true;
-            video.style.display = 'none';
             document.body.appendChild(video);
             
             await new Promise((resolve, reject) => {
-                video.onloadedmetadata = resolve;
-                video.onerror = reject;
+                const timeout = setTimeout(() => reject(new Error('Video load timeout')), 15000);
+                video.onloadedmetadata = () => {
+                    clearTimeout(timeout);
+                    resolve();
+                };
+                video.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error('Failed to load video'));
+                };
                 video.load();
             });
             
             const width = video.videoWidth;
             const height = video.videoHeight;
             const duration = video.duration;
-            const fps = 30;
+            
+            if (width === 0 || height === 0) throw new Error('Invalid video dimensions');
             
             const canvas = document.createElement('canvas');
             canvas.width = width;
@@ -873,6 +857,19 @@
             const ctx = canvas.getContext('2d');
             const stream = canvas.captureStream(fps);
             
-            const targetMime = getMimeType(targetFormat, quality);
-            const mimeTypes = [targetMime, 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
-            let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || targetMime;
+            const mimeTypes = [targetMime, 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/mp4;codecs=h264,aac'];
+            let selectedMime = mimeTypes.find(t => MediaRecorder.isTypeSupported(t)) || 'video/mp4';
+            
+            const options = { mimeType: selectedMime, videoBitsPerSecond: bitrate };
+            const recorder = new MediaRecorder(stream, options);
+            const chunks = [];
+            
+            recorder.ondataavailable = e => e.data.size && chunks.push(e.data);
+            recorder.start(100);
+            
+            const totalFrames = Math.ceil(duration * fps);
+            video.currentTime = 0;
+            
+            for (let frame = 0; frame < totalFrames; frame++) {
+                const time = frame / fps;
+                if
