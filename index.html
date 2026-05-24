@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · Working Upload · All Formats</title>
+    <title>Video Compressor · Created by Mahmoud Hamouda</title>
     <style>
         * {
             margin: 0;
@@ -35,6 +35,7 @@
             color: white;
             padding: 28px 32px;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
@@ -54,6 +55,17 @@
             padding: 4px 14px;
             font-size: 0.7rem;
             margin-top: 10px;
+        }
+
+        .creator-tag {
+            position: absolute;
+            bottom: 12px;
+            right: 20px;
+            font-size: 0.7rem;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
         }
 
         .content {
@@ -176,6 +188,15 @@
             background: #475569;
         }
 
+        button.whatsapp {
+            background: #25D366;
+        }
+
+        button.whatsapp:hover {
+            background: #128C7E;
+            transform: scale(1.02);
+        }
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -241,18 +262,59 @@
             color: #64748b;
         }
 
+        .contact-bar {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .credit {
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+
+        .credit strong {
+            color: #a78bfa;
+        }
+
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .whatsapp-link:hover {
+            background: #128C7E;
+            transform: scale(1.02);
+        }
+
         footer {
             text-align: center;
             font-size: 0.7rem;
             padding: 18px;
-            border-top: 1px solid #e2e8f0;
-            color: #64748b;
             background: #faf9ff;
+            color: #64748b;
         }
 
         @media (max-width: 640px) {
             .content { padding: 20px; }
             .settings-grid { grid-template-columns: 1fr; }
+            .contact-bar { flex-direction: column; text-align: center; }
+            .creator-tag { position: static; margin-top: 10px; display: inline-block; }
+            .header { padding-bottom: 20px; }
         }
     </style>
 </head>
@@ -263,6 +325,7 @@
             <h1>🎬 Universal Video Compressor</h1>
             <p>MP4 · MOV · AVI · MKV · WebM · All formats supported</p>
             <div class="badge">⚡ 100% local · No upload · Privacy guaranteed</div>
+            <div class="creator-tag">Created by Mahmoud Hamouda</div>
         </div>
         <div class="content">
             <div class="upload-area" id="uploadZone">
@@ -328,13 +391,26 @@
             </div>
 
             <div class="status-area" id="statusMsg">
-                📌 Ready — Click the browse button or drag a video file to begin
+                📌 Ready — Click the "Browse" button above or drag a video file to begin
             </div>
             <div class="info-note">
                 💡 Works with MP4, WebM, AVI, MOV, MKV. Click the "Browse" button above to select a video file.
+                Compression uses Canvas + MediaRecorder API. For best results, use shorter videos (under 5 minutes).
             </div>
         </div>
-        <footer>🔒 100% local processing · Your video never leaves your device</footer>
+
+        <!-- Contact Bar with WhatsApp API -->
+        <div class="contact-bar">
+            <div class="credit">
+                👨‍💻 Developed by <strong>Mahmoud Hamouda</strong> | © 2024 All rights reserved
+            </div>
+            <a href="https://wa.me/966564700174" target="_blank" class="whatsapp-link" id="whatsappLink">
+                💬 Contact on WhatsApp
+            </a>
+        </div>
+        <footer>
+            🔒 100% local processing · Your video never leaves your device · No data stored
+        </footer>
     </div>
 </div>
 
@@ -362,6 +438,11 @@
     const progressContainer = document.getElementById('progressContainer');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
+    const whatsappLink = document.getElementById('whatsappLink');
+
+    // WhatsApp API - ensure correct link format
+    const whatsappNumber = "966564700174";
+    whatsappLink.href = `https://wa.me/${whatsappNumber}?text=Hello%20Mahmoud%20Hamouda%2C%20I%20have%20a%20question%20about%20the%20Video%20Compressor%20tool.`;
 
     // Helper functions
     function setStatus(msg, type = 'info') {
@@ -414,7 +495,7 @@
         return parseFloat(resolutionScale.value);
     }
 
-    // Handle file upload - THIS IS THE KEY FUNCTION
+    // Handle file upload
     function handleFile(file) {
         console.log('handleFile called with:', file ? file.name : 'null');
         
@@ -677,7 +758,7 @@
         console.log('Cleared all data');
     }
 
-    // DIRECT FILE INPUT HANDLER - Most reliable
+    // File input handler
     fileInput.addEventListener('change', function(e) {
         console.log('File input change event triggered', e.target.files);
         if (e.target.files && e.target.files.length > 0) {
@@ -693,7 +774,6 @@
     // Click on upload zone - trigger file input
     uploadZone.addEventListener('click', function(e) {
         console.log('Upload zone clicked, triggering file input');
-        // Don't trigger if click came from the file input itself
         if (e.target !== fileInput) {
             fileInput.click();
         }
@@ -704,7 +784,6 @@
         e.preventDefault();
         e.stopPropagation();
         uploadZone.classList.add('drag-over');
-        console.log('Drag over');
     });
     
     uploadZone.addEventListener('dragleave', function(e) {
@@ -725,7 +804,6 @@
             const file = files[0];
             if (file.type.startsWith('video/')) {
                 handleFile(file);
-                // Also set file input value for consistency
                 const dataTransfer = new DataTransfer();
                 dataTransfer.items.add(file);
                 fileInput.files = dataTransfer.files;
@@ -742,7 +820,7 @@
     
     // Initial status
     setStatus('📌 Ready — Click the "Browse" button above or drag a video file to begin', 'info');
-    console.log('Video Compressor initialized - File upload should work now');
+    console.log('Video Compressor initialized - Created by Mahmoud Hamouda');
 </script>
 </body>
 </html>
