@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · All Formats · Working Upload</title>
+    <title>Video Compressor · Working Upload · All Formats</title>
     <style>
         * {
             margin: 0;
@@ -79,7 +79,6 @@
         .upload-area.drag-over {
             background: #e0e7ff;
             border-color: #4f46e5;
-            transform: scale(0.98);
         }
 
         .upload-icon {
@@ -148,18 +147,6 @@
         select:focus, input:focus {
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-        }
-
-        .range-value {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-            font-size: 0.75rem;
-            color: #64748b;
-        }
-
-        input[type="range"] {
-            padding: 0;
         }
 
         .action-buttons {
@@ -282,7 +269,7 @@
                 <div class="upload-icon">🎥📁</div>
                 <div class="file-name" id="fileNameDisplay">Click or drag video file here</div>
                 <div class="file-info" id="fileInfoDisplay"></div>
-                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/*">
+                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/*" style="display: block; margin: 20px auto 0; width: auto; max-width: 100%;">
                 <div class="format-badge">🔒 Supports MP4, AVI, MOV, MKV, WebM, FLV, WMV</div>
             </div>
 
@@ -341,11 +328,10 @@
             </div>
 
             <div class="status-area" id="statusMsg">
-                📌 Ready — Click or drag a video file to begin compression
+                📌 Ready — Click the browse button or drag a video file to begin
             </div>
             <div class="info-note">
-                💡 Works with MP4, WebM, AVI, MOV, MKV. Compression uses Canvas + MediaRecorder API.
-                For best results, use shorter videos (under 5 minutes).
+                💡 Works with MP4, WebM, AVI, MOV, MKV. Click the "Browse" button above to select a video file.
             </div>
         </div>
         <footer>🔒 100% local processing · Your video never leaves your device</footer>
@@ -379,7 +365,7 @@
 
     // Helper functions
     function setStatus(msg, type = 'info') {
-        console.log('[Status]', msg, type);
+        console.log('[Status]', msg);
         statusDiv.textContent = msg;
         statusDiv.classList.remove('status-success', 'status-error', 'status-warning');
         if (type === 'success') statusDiv.classList.add('status-success');
@@ -406,7 +392,7 @@
 
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
-        if (bytes === undefined || bytes === null) return 'Unknown';
+        if (!bytes) return 'Unknown';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -428,9 +414,9 @@
         return parseFloat(resolutionScale.value);
     }
 
-    // Handle file upload
+    // Handle file upload - THIS IS THE KEY FUNCTION
     function handleFile(file) {
-        console.log('handleFile called with:', file);
+        console.log('handleFile called with:', file ? file.name : 'null');
         
         if (!file) {
             setStatus('❌ No file selected. Please choose a video file.', 'error');
@@ -502,12 +488,16 @@
             
             // Wait for video metadata
             await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => reject(new Error('Video loading timeout')), 15000);
                 video.onloadedmetadata = () => {
+                    clearTimeout(timeout);
                     console.log('Video loaded:', video.videoWidth, 'x', video.videoHeight);
                     resolve();
                 };
-                video.onerror = () => reject(new Error('Failed to load video metadata. The file might be corrupted.'));
-                setTimeout(() => reject(new Error('Video loading timeout')), 10000);
+                video.onerror = () => {
+                    clearTimeout(timeout);
+                    reject(new Error('Failed to load video. The file might be corrupted.'));
+                };
                 video.load();
             });
             
@@ -537,7 +527,6 @@
                 mimeType,
                 'video/webm;codecs=vp9,opus',
                 'video/webm;codecs=vp8,opus',
-                'video/webm;codecs=h264,opus',
                 'video/mp4;codecs=h264,aac'
             ];
             
@@ -575,18 +564,13 @@
             
             // Process frames
             const duration = video.duration;
-            let frameCount = 0;
             
             const processFrame = () => {
                 if (video.paused || video.ended) return;
-                
-                frameCount++;
                 ctx.drawImage(video, 0, 0, newWidth, newHeight);
-                
                 const currentTime = video.currentTime;
                 const progressPercent = (currentTime / duration) * 100;
                 updateProgress(20 + progressPercent * 0.7, `Encoding: ${Math.floor(progressPercent)}%`);
-                
                 requestAnimationFrame(processFrame);
             };
             
@@ -693,67 +677,72 @@
         console.log('Cleared all data');
     }
 
-    // Event listeners
-    function initializeEventListeners() {
-        console.log('Initializing event listeners');
-        
-        // Click on upload zone
-        uploadZone.addEventListener('click', (e) => {
-            console.log('Upload zone clicked');
-            fileInput.click();
-        });
-        
-        // File input change
-        fileInput.addEventListener('change', (e) => {
-            console.log('File input changed', e.target.files);
-            if (e.target.files && e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            } else {
-                console.log('No file selected');
-            }
-        });
-        
-        // Drag and drop
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadZone.classList.add('drag-over');
-        });
-        
-        uploadZone.addEventListener('dragleave', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadZone.classList.remove('drag-over');
-        });
-        
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            uploadZone.classList.remove('drag-over');
-            
-            const files = e.dataTransfer.files;
-            console.log('Files dropped:', files);
-            
-            if (files && files.length > 0) {
-                const file = files[0];
-                if (file.type.startsWith('video/')) {
-                    handleFile(file);
-                } else {
-                    setStatus(`❌ "${file.name}" is not a video file. Please drop a video file.`, 'error');
-                }
-            }
-        });
-        
-        // Button events
-        compressBtn.addEventListener('click', compressVideo);
-        downloadBtn.addEventListener('click', downloadVideo);
-        clearBtn.addEventListener('click', clearAll);
-    }
+    // DIRECT FILE INPUT HANDLER - Most reliable
+    fileInput.addEventListener('change', function(e) {
+        console.log('File input change event triggered', e.target.files);
+        if (e.target.files && e.target.files.length > 0) {
+            const file = e.target.files[0];
+            console.log('Selected file:', file.name, file.type, file.size);
+            handleFile(file);
+        } else {
+            console.log('No file selected');
+            setStatus('No file selected. Please choose a video file.', 'warning');
+        }
+    });
     
-    // Initialize on page load
-    initializeEventListeners();
-    setStatus('📌 Ready — Click or drag a video file to begin compression', 'info');
-    console.log('Video Compressor initialized successfully');
+    // Click on upload zone - trigger file input
+    uploadZone.addEventListener('click', function(e) {
+        console.log('Upload zone clicked, triggering file input');
+        // Don't trigger if click came from the file input itself
+        if (e.target !== fileInput) {
+            fileInput.click();
+        }
+    });
+    
+    // Drag and drop handlers
+    uploadZone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadZone.classList.add('drag-over');
+        console.log('Drag over');
+    });
+    
+    uploadZone.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadZone.classList.remove('drag-over');
+    });
+    
+    uploadZone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadZone.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        console.log('Files dropped:', files);
+        
+        if (files && files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('video/')) {
+                handleFile(file);
+                // Also set file input value for consistency
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+            } else {
+                setStatus(`❌ "${file.name}" is not a video file. Please drop a video file.`, 'error');
+            }
+        }
+    });
+    
+    // Button events
+    compressBtn.addEventListener('click', compressVideo);
+    downloadBtn.addEventListener('click', downloadVideo);
+    clearBtn.addEventListener('click', clearAll);
+    
+    // Initial status
+    setStatus('📌 Ready — Click the "Browse" button above or drag a video file to begin', 'info');
+    console.log('Video Compressor initialized - File upload should work now');
 </script>
 </body>
 </html>
