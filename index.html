@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Video Compressor · All Formats · Simple & Reliable</title>
+    <title>Video Compressor · All Formats · Working Upload</title>
     <style>
         * {
             margin: 0;
@@ -74,12 +74,12 @@
         .upload-area:hover {
             background: #f0f2ff;
             border-color: #667eea;
-            transform: scale(0.99);
         }
 
         .upload-area.drag-over {
             background: #e0e7ff;
             border-color: #4f46e5;
+            transform: scale(0.98);
         }
 
         .upload-icon {
@@ -189,10 +189,6 @@
             background: #475569;
         }
 
-        button.danger {
-            background: #ef4444;
-        }
-
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -279,14 +275,14 @@
         <div class="header">
             <h1>🎬 Universal Video Compressor</h1>
             <p>MP4 · MOV · AVI · MKV · WebM · All formats supported</p>
-            <div class="badge">⚙️ Browser-based compression · No upload required</div>
+            <div class="badge">⚡ 100% local · No upload · Privacy guaranteed</div>
         </div>
         <div class="content">
             <div class="upload-area" id="uploadZone">
                 <div class="upload-icon">🎥📁</div>
                 <div class="file-name" id="fileNameDisplay">Click or drag video file here</div>
                 <div class="file-info" id="fileInfoDisplay"></div>
-                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/*">
+                <input type="file" id="fileInput" accept="video/mp4,video/webm,video/quicktime,video/x-msvideo,video/x-matroska,video/avi,video/mov,video/mkv,video/*">
                 <div class="format-badge">🔒 Supports MP4, AVI, MOV, MKV, WebM, FLV, WMV</div>
             </div>
 
@@ -345,11 +341,11 @@
             </div>
 
             <div class="status-area" id="statusMsg">
-                📌 Ready — Upload a video file to begin compression
+                📌 Ready — Click or drag a video file to begin compression
             </div>
             <div class="info-note">
-                💡 Works with MP4, WebM, AVI, MOV, MKV. Compression uses HTML5 Canvas + MediaRecorder API. 
-                For best results, use MP4 format.
+                💡 Works with MP4, WebM, AVI, MOV, MKV. Compression uses Canvas + MediaRecorder API.
+                For best results, use shorter videos (under 5 minutes).
             </div>
         </div>
         <footer>🔒 100% local processing · Your video never leaves your device</footer>
@@ -362,7 +358,6 @@
     let originalVideoUrl = null;
     let compressedBlob = null;
     let isCompressing = false;
-    let videoElement = null;
 
     // DOM elements
     const uploadZone = document.getElementById('uploadZone');
@@ -384,6 +379,7 @@
 
     // Helper functions
     function setStatus(msg, type = 'info') {
+        console.log('[Status]', msg, type);
         statusDiv.textContent = msg;
         statusDiv.classList.remove('status-success', 'status-error', 'status-warning');
         if (type === 'success') statusDiv.classList.add('status-success');
@@ -392,46 +388,86 @@
     }
 
     function updateProgress(percent, text) {
-        if (progressContainer.style.display === 'none') progressContainer.style.display = 'block';
-        progressFill.style.width = `${Math.min(100, Math.max(0, percent))}%`;
-        progressText.textContent = text || `${Math.round(percent)}%`;
-        if (percent >= 100) {
+        if (progressContainer.style.display === 'none') {
+            progressContainer.style.display = 'block';
+        }
+        const clampedPercent = Math.min(100, Math.max(0, percent));
+        progressFill.style.width = `${clampedPercent}%`;
+        progressText.textContent = text || `${Math.round(clampedPercent)}%`;
+        
+        if (clampedPercent >= 100) {
             setTimeout(() => {
                 if (!isCompressing) {
-                    setTimeout(() => {
-                        progressContainer.style.display = 'none';
-                    }, 1500);
+                    progressContainer.style.display = 'none';
                 }
-            }, 500);
+            }, 2000);
         }
     }
 
     function formatFileSize(bytes) {
         if (bytes === 0) return '0 Bytes';
+        if (bytes === undefined || bytes === null) return 'Unknown';
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
-    // Get compression bitrate based on preset
     function getBitrate() {
         const preset = qualityPreset.value;
         switch(preset) {
-            case 'ultra': return 300000;  // 300 kbps
-            case 'high': return 800000;   // 800 kbps
-            case 'medium': return 1500000; // 1.5 Mbps
-            case 'light': return 2500000;  // 2.5 Mbps
+            case 'ultra': return 300000;
+            case 'high': return 800000;
+            case 'medium': return 1500000;
+            case 'light': return 2500000;
             default: return 800000;
         }
     }
 
-    // Get video resolution scale
     function getScale() {
         return parseFloat(resolutionScale.value);
     }
 
-    // Compress video using Canvas and MediaRecorder
+    // Handle file upload
+    function handleFile(file) {
+        console.log('handleFile called with:', file);
+        
+        if (!file) {
+            setStatus('❌ No file selected. Please choose a video file.', 'error');
+            return;
+        }
+        
+        if (!file.type.startsWith('video/')) {
+            setStatus(`❌ "${file.name}" is not a video file. Please select a video file (MP4, AVI, MOV, MKV, WebM).`, 'error');
+            return;
+        }
+        
+        // Clean up previous URL
+        if (originalVideoUrl) {
+            URL.revokeObjectURL(originalVideoUrl);
+        }
+        
+        originalVideoFile = file;
+        originalVideoUrl = URL.createObjectURL(file);
+        
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        const fileType = file.type.split('/')[1]?.toUpperCase() || file.name.split('.').pop().toUpperCase();
+        
+        fileNameDisplay.innerHTML = `🎬 ${file.name}`;
+        fileInfoDisplay.innerHTML = `📊 Size: ${formatFileSize(file.size)} | 📹 Type: ${fileType}`;
+        
+        setStatus(`✅ Successfully loaded: ${file.name} (${sizeMB} MB). Ready to compress.`, 'success');
+        
+        // Enable compress button
+        compressBtn.disabled = false;
+        downloadBtn.disabled = true;
+        compressedBlob = null;
+        
+        // Hide progress if visible
+        progressContainer.style.display = 'none';
+    }
+
+    // Compress video
     async function compressVideo() {
         if (!originalVideoFile) {
             setStatus('⚠️ Please upload a video file first.', 'error');
@@ -439,7 +475,7 @@
         }
 
         if (isCompressing) {
-            setStatus('⏳ Compression already in progress...', 'warning');
+            setStatus('⏳ Compression already in progress... Please wait.', 'warning');
             return;
         }
 
@@ -453,19 +489,25 @@
         const removeAudioTrack = removeAudio.checked;
         const fastEncoding = fastMode.checked;
         
-        updateProgress(5, '🎬 Loading video...');
-        setStatus(`🔄 Compressing video with ${qualityPreset.options[qualityPreset.selectedIndex]?.text}...`);
+        updateProgress(5, 'Loading video...');
+        setStatus(`🔄 Compressing video with ${qualityPreset.options[qualityPreset.selectedIndex]?.text}... This may take a while.`, 'info');
 
         try {
-            // Create video element to get video dimensions
+            // Create video element
             const videoUrl = URL.createObjectURL(originalVideoFile);
             const video = document.createElement('video');
             video.src = videoUrl;
             video.muted = true;
+            video.crossOrigin = 'anonymous';
             
+            // Wait for video metadata
             await new Promise((resolve, reject) => {
-                video.onloadedmetadata = () => resolve();
-                video.onerror = () => reject(new Error('Failed to load video metadata'));
+                video.onloadedmetadata = () => {
+                    console.log('Video loaded:', video.videoWidth, 'x', video.videoHeight);
+                    resolve();
+                };
+                video.onerror = () => reject(new Error('Failed to load video metadata. The file might be corrupted.'));
+                setTimeout(() => reject(new Error('Video loading timeout')), 10000);
                 video.load();
             });
             
@@ -474,60 +516,33 @@
             const newWidth = Math.floor(originalWidth * scale);
             const newHeight = Math.floor(originalHeight * scale);
             
-            updateProgress(15, `📐 Scaling to ${newWidth}x${newHeight}`);
+            if (newWidth < 16 || newHeight < 16) {
+                throw new Error('Resolution too small after scaling');
+            }
             
-            // Set up canvas for capturing frames
+            updateProgress(15, `Scaling to ${newWidth}x${newHeight}`);
+            
+            // Setup canvas
             const canvas = document.createElement('canvas');
             canvas.width = newWidth;
             canvas.height = newHeight;
             const ctx = canvas.getContext('2d');
             
-            // Create media stream from canvas
-            const stream = canvas.captureStream(30); // 30 fps
-            let audioStream = null;
-            
-            // Get audio track if not removing
-            if (!removeAudioTrack) {
-                try {
-                    const audioContext = new AudioContext();
-                    const source = audioContext.createMediaElementSource(video);
-                    const destination = audioContext.createMediaStreamDestination();
-                    source.connect(destination);
-                    source.connect(audioContext.destination);
-                    audioStream = destination.stream;
-                    await audioContext.resume();
-                } catch (audioErr) {
-                    console.warn('Could not capture audio:', audioErr);
-                }
-            }
-            
-            // Combine video and audio streams
-            let finalStream = stream;
-            if (audioStream && audioStream.getAudioTracks().length > 0) {
-                finalStream = new MediaStream([
-                    ...stream.getVideoTracks(),
-                    ...audioStream.getAudioTracks()
-                ]);
-            }
+            // Setup media recorder
+            const stream = canvas.captureStream(30);
             
             // Determine MIME type
-            let mimeType = '';
-            if (outputExt === 'mp4') {
-                mimeType = 'video/mp4';
-            } else {
-                mimeType = 'video/webm';
-            }
-            
-            // Check supported MIME types
-            const supportedTypes = [
+            let mimeType = outputExt === 'mp4' ? 'video/mp4' : 'video/webm';
+            const mimeTypes = [
                 mimeType,
                 'video/webm;codecs=vp9,opus',
                 'video/webm;codecs=vp8,opus',
+                'video/webm;codecs=h264,opus',
                 'video/mp4;codecs=h264,aac'
             ];
             
-            let selectedMimeType = '';
-            for (const type of supportedTypes) {
+            let selectedMimeType = null;
+            for (const type of mimeTypes) {
                 if (MediaRecorder.isTypeSupported(type)) {
                     selectedMimeType = type;
                     break;
@@ -535,21 +550,17 @@
             }
             
             if (!selectedMimeType) {
-                throw new Error('No supported video codec found in your browser');
+                throw new Error('Your browser does not support video recording with compression');
             }
             
-            // Configure MediaRecorder
+            console.log('Using MIME type:', selectedMimeType);
+            
             const options = {
                 mimeType: selectedMimeType,
-                videoBitsPerSecond: bitrate,
-                audioBitsPerSecond: 64000
+                videoBitsPerSecond: fastEncoding ? bitrate * 0.8 : bitrate
             };
             
-            if (fastEncoding) {
-                options.videoBitsPerSecond = bitrate * 0.7;
-            }
-            
-            const mediaRecorder = new MediaRecorder(finalStream, options);
+            const mediaRecorder = new MediaRecorder(stream, options);
             const chunks = [];
             
             mediaRecorder.ondataavailable = (event) => {
@@ -558,53 +569,56 @@
                 }
             };
             
-            // Process video frames
+            // Start playing video
             video.currentTime = 0;
-            video.play();
+            await video.play();
             
+            // Process frames
             const duration = video.duration;
-            let lastTimestamp = 0;
+            let frameCount = 0;
             
             const processFrame = () => {
                 if (video.paused || video.ended) return;
                 
-                const currentTime = video.currentTime;
-                const progress = (currentTime / duration) * 100;
-                updateProgress(15 + progress * 0.7, `🎬 Processing: ${Math.floor(progress)}%`);
-                
-                // Draw current frame to canvas
+                frameCount++;
                 ctx.drawImage(video, 0, 0, newWidth, newHeight);
+                
+                const currentTime = video.currentTime;
+                const progressPercent = (currentTime / duration) * 100;
+                updateProgress(20 + progressPercent * 0.7, `Encoding: ${Math.floor(progressPercent)}%`);
                 
                 requestAnimationFrame(processFrame);
             };
             
             // Start recording
-            mediaRecorder.start(100); // Collect data every 100ms
-            
+            mediaRecorder.start(250);
             processFrame();
             
             // Wait for video to end
             await new Promise((resolve) => {
                 video.onended = () => {
                     setTimeout(() => {
-                        mediaRecorder.stop();
+                        if (mediaRecorder.state === 'recording') {
+                            mediaRecorder.stop();
+                        }
                         resolve();
-                    }, 200);
+                    }, 500);
                 };
             });
             
-            // Wait for final data
+            // Wait for recorder to finish
             await new Promise((resolve) => {
-                mediaRecorder.onstop = () => {
+                if (mediaRecorder.state === 'inactive') {
                     resolve();
-                };
+                } else {
+                    mediaRecorder.onstop = () => resolve();
+                }
             });
             
-            updateProgress(90, '📦 Building compressed file...');
+            updateProgress(95, 'Building final file...');
             
             // Create compressed blob
-            const compressedFile = new Blob(chunks, { type: selectedMimeType });
-            compressedBlob = compressedFile;
+            compressedBlob = new Blob(chunks, { type: selectedMimeType });
             
             // Clean up
             URL.revokeObjectURL(videoUrl);
@@ -616,7 +630,7 @@
             const newSize = formatFileSize(compressedBlob.size);
             const savedPercent = ((1 - compressedBlob.size / originalVideoFile.size) * 100).toFixed(1);
             
-            updateProgress(100, `✅ Complete! ${originalSize} → ${newSize}`);
+            updateProgress(100, `Complete! ${originalSize} → ${newSize}`);
             setStatus(`✅ Success! Size reduced from ${originalSize} to ${newSize} (${savedPercent}% smaller)`, 'success');
             
             downloadBtn.disabled = false;
@@ -625,6 +639,7 @@
             console.error('Compression error:', err);
             setStatus(`❌ Compression failed: ${err.message}`, 'error');
             compressedBlob = null;
+            progressContainer.style.display = 'none';
         } finally {
             isCompressing = false;
             if (originalVideoFile) {
@@ -633,48 +648,16 @@
         }
     }
 
-    // Handle file upload
-    function handleFile(file) {
-        if (!file) return;
-        
-        if (!file.type.startsWith('video/')) {
-            setStatus('❌ Please select a valid video file (MP4, AVI, MOV, MKV, WebM, etc.)', 'error');
-            return;
-        }
-        
-        // Clean up previous URL
-        if (originalVideoUrl) {
-            URL.revokeObjectURL(originalVideoUrl);
-        }
-        
-        originalVideoFile = file;
-        originalVideoUrl = URL.createObjectURL(file);
-        
-        const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
-        fileNameDisplay.textContent = `🎬 ${file.name}`;
-        fileInfoDisplay.textContent = `Size: ${formatFileSize(file.size)} | Type: ${file.type.split('/')[1]?.toUpperCase() || 'Unknown'}`;
-        
-        setStatus(`✅ Loaded: ${file.name} (${sizeMB} MB). Ready to compress.`, 'success');
-        compressBtn.disabled = false;
-        downloadBtn.disabled = true;
-        compressedBlob = null;
-        
-        // Hide progress
-        setTimeout(() => {
-            if (!isCompressing) progressContainer.style.display = 'none';
-        }, 1000);
-    }
-
     // Download compressed video
     function downloadVideo() {
         if (!compressedBlob) {
-            setStatus('No compressed video. Please compress first.', 'error');
+            setStatus('⚠️ No compressed video. Please compress first.', 'error');
             return;
         }
         
         const ext = outputFormat.value;
         const originalName = originalVideoFile?.name.replace(/\.[^/.]+$/, '') || 'compressed_video';
-        const downloadName = `${originalName}_compressed.${ext}`;
+        const downloadName = `${originalName}_compressed_${Date.now()}.${ext}`;
         const url = URL.createObjectURL(compressedBlob);
         const a = document.createElement('a');
         a.href = url;
@@ -682,7 +665,7 @@
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        setTimeout(() => URL.revokeObjectURL(url), 100);
         setStatus(`📥 Download started: ${downloadName}`, 'success');
     }
 
@@ -696,8 +679,8 @@
         compressedBlob = null;
         isCompressing = false;
         
-        fileNameDisplay.textContent = "Click or drag video file here";
-        fileInfoDisplay.textContent = "";
+        fileNameDisplay.innerHTML = "Click or drag video file here";
+        fileInfoDisplay.innerHTML = "";
         compressBtn.disabled = true;
         downloadBtn.disabled = true;
         
@@ -706,46 +689,71 @@
         
         // Reset file input
         fileInput.value = '';
+        
+        console.log('Cleared all data');
     }
 
     // Event listeners
-    uploadZone.addEventListener('click', () => fileInput.click());
+    function initializeEventListeners() {
+        console.log('Initializing event listeners');
+        
+        // Click on upload zone
+        uploadZone.addEventListener('click', (e) => {
+            console.log('Upload zone clicked');
+            fileInput.click();
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            console.log('File input changed', e.target.files);
+            if (e.target.files && e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            } else {
+                console.log('No file selected');
+            }
+        });
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.classList.add('drag-over');
+        });
+        
+        uploadZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.classList.remove('drag-over');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            uploadZone.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            console.log('Files dropped:', files);
+            
+            if (files && files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('video/')) {
+                    handleFile(file);
+                } else {
+                    setStatus(`❌ "${file.name}" is not a video file. Please drop a video file.`, 'error');
+                }
+            }
+        });
+        
+        // Button events
+        compressBtn.addEventListener('click', compressVideo);
+        downloadBtn.addEventListener('click', downloadVideo);
+        clearBtn.addEventListener('click', clearAll);
+    }
     
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            handleFile(e.target.files[0]);
-        }
-    });
-    
-    // Drag and drop
-    uploadZone.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadZone.classList.add('drag-over');
-    });
-    
-    uploadZone.addEventListener('dragleave', () => {
-        uploadZone.classList.remove('drag-over');
-    });
-    
-    uploadZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadZone.classList.remove('drag-over');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('video/')) {
-            handleFile(file);
-        } else {
-            setStatus('❌ Please drop a valid video file.', 'error');
-        }
-    });
-    
-    compressBtn.addEventListener('click', compressVideo);
-    downloadBtn.addEventListener('click', downloadVideo);
-    clearBtn.addEventListener('click', clearAll);
-    
-    // Initial status
-    setStatus('📌 Ready — Upload any video file (MP4, AVI, MOV, MKV, WebM) to begin compression', 'info');
-    
-    console.log('Video Compressor Ready - Using Canvas + MediaRecorder API');
+    // Initialize on page load
+    initializeEventListeners();
+    setStatus('📌 Ready — Click or drag a video file to begin compression', 'info');
+    console.log('Video Compressor initialized successfully');
 </script>
 </body>
 </html>
